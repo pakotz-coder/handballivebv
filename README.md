@@ -1,5 +1,7 @@
 # HandbalLiveBV — site
 
+Adresa site-ului: https://handballivebv.netlify.app/ (panoul de administrare: `/admin`).
+
 Site-ul proiectului comunitar HandbalLiveBV: transmisii gratuite pe YouTube ale meciurilor de
 handbal juvenil din judetul Brasov. Arata programul transmisiilor, arhiva, rezultatele si
 clasamentele cluburilor brasovene si are un panou de administrare gandit pentru telefon.
@@ -27,6 +29,8 @@ clasamentele cluburilor brasovene si are un panou de administrare gandit pentru 
    adresa este scrisa in pagini la build.
 4. Apasa **Deploy**. Netlify Blobs se activeaza singur, nu trebuie configurat.
 5. Optional: la **Domain management** schimba numele site-ului sau leaga un domeniu propriu.
+   Dupa orice schimbare de nume sau de domeniu porneste un deploy nou (**Deploys → Trigger deploy**):
+   adresa site-ului este scrisa in pagini la build (imaginea afisata cand dai share pe Facebook sau WhatsApp).
 
 De acum, orice `git push` pe ramura principala republica site-ul.
 
