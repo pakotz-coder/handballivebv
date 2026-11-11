@@ -6,7 +6,8 @@ import { cacheStore } from './store.mjs';
 const COOKIE = 'hlbv_admin';
 const DAYS = 60;
 
-const password = () => process.env.ADMIN_PASSWORD || '';
+// Spatiile de la inceput si sfarsit (ramase la copiere sau puse de tastatura telefonului) nu conteaza.
+const password = () => (process.env.ADMIN_PASSWORD || '').trim();
 // Cheia de semnare deriva din parola (scrypt, ca un cookie scurs sa nu ajute la ghicirea parolei):
 // schimbarea parolei invalideaza toate sesiunile.
 let derived = null;
@@ -23,7 +24,7 @@ const safeEqual = (a, b) => {
 };
 
 export const passwordConfigured = () => password().length >= 8;
-export const checkPassword = (given) => passwordConfigured() && typeof given === 'string' && safeEqual(given, password());
+export const checkPassword = (given) => passwordConfigured() && typeof given === 'string' && safeEqual(given.trim(), password());
 
 export function sessionCookie() {
   const expires = Date.now() + DAYS * 86400000;
