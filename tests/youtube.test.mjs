@@ -61,3 +61,50 @@ test('doua video-uri posibile pentru acelasi meci, un video deja folosit, legatu
   assert.deepEqual(autoMatch([a], [{ ...u15, noAuto: true }]), {}, 'legatura scoasa manual nu se reface');
   assert.deepEqual(autoMatch([a], [u15, { ...u17, videoId: 'j' }]), {}, 'video-ul e deja legat de alt meci');
 });
+
+// --- cazuri gasite la verificarea independenta ---
+import { buildVocab } from '../netlify/lib/youtube.mjs';
+import { parseSnapshot } from './fixtures.mjs';
+
+// Toate meciurile reale din cele patru serii, in forma folosita la potrivire.
+const KEYS = { 2110: 'u15f', 2109: 'u17f', 2111: 'u19f', 2099: 'divaf' };
+const fixtures = parseSnapshot().flatMap((c) => c.matches.map((m) => ({ matchId: m.broj, seriesKey: KEYS[c.compId], date: m.d, home: m.e1, away: m.e2 })));
+const vocab = buildVocab(fixtures.flatMap((f) => [f.home, f.away]));
+const fixture = (id) => fixtures.find((f) => f.matchId === id);
+
+test('prefixul se verifica langa numele echipei: "CSS Fagaras - CSM Corona" nu e meciul lui CSM Fagaras', () => {
+  const m = stream(9, 'divaf', '2026-11-20', 'CSM Fagaras', 'CSM Corona Brasov');
+  assert.equal(isCandidate(video('p1', 'CSS Fagaras - CSM Corona', '2026-11-19T08:00:00+00:00'), m, vocab), false);
+  assert.equal(isCandidate(video('p2', 'CSM Fagaras - CSM Corona', '2026-11-19T08:00:00+00:00'), m, vocab), true);
+  const dinamo = stream(10, 'u15f', '2026-11-20', 'CSS Dinamo Brasov', 'CSM Corona Brasov');
+  assert.equal(isCandidate(video('p3', 'Dinamo J3 - CSM Corona J3', '2026-11-19T08:00:00+00:00'), dinamo, vocab), true, 'prefixul adversarului nu e scris');
+});
+
+test('titluri scurte: un cuvant care apartine unei singure echipe e de ajuns; unul comun mai multora nu', () => {
+  assert.deepEqual(autoMatch([video('s1', 'Sporting - Corona U15', '2026-11-14T08:00:00+00:00')], [fixture(1680855)], fixtures), { 1680855: 's1' });
+  const codlea = fixtures.find((f) => f.seriesKey === 'u15f' && f.home === 'ACS Transilvania Brasov' && f.away === 'CS Magura Codlea' && f.date === '2026-11-15');
+  assert.ok(codlea);
+  assert.equal(isCandidate(video('s2', 'Transilvania - Codlea', '2026-11-14T08:00:00+00:00'), codlea, vocab), true);
+  assert.equal(isCandidate(video('s3', 'Transilvania - Magura', '2026-11-14T08:00:00+00:00'), codlea, vocab), false, '"Magura" e si Codlea, si Cisnadie');
+});
+
+test('aceleasi cluburi joaca si la alta categorie in aceeasi perioada: fara categorie in titlu nu se leaga, chiar daca doar un meci e marcat', () => {
+  const u15match = stream(101, 'u15f', '2026-11-21', 'ACS Transilvania Brasov', 'CSM Corona Brasov');
+  const u17match = stream(102, 'u17f', '2026-11-22', 'ACS Transilvania Brasov', 'CSM Corona Brasov');
+  const v = video('c1', 'Transilvania - Corona', '2026-11-20T08:00:00+00:00');
+  assert.deepEqual(autoMatch([v], [u15match], [u15match, u17match]), {});
+  assert.deepEqual(autoMatch([video('c2', 'Transilvania - Corona U15', '2026-11-20T08:00:00+00:00')], [u15match], [u15match, u17match]), { 101: 'c2' });
+});
+
+test('anul din data conteaza, ordinea echipelor conteaza, rezumatele nu se leaga automat', () => {
+  assert.equal(isCandidate(video('d1', 'Sporting Ghimbav - CSM Corona 15.11.2025', '2026-11-14T08:00:00+00:00'), u15, vocab), false, 'alt an');
+  assert.equal(isCandidate(video('d2', 'Sporting Ghimbav - CSM Corona 15.11', '2025-11-14T08:00:00+00:00'), u15, vocab), false, 'video de acum un an');
+  assert.equal(isCandidate(video('d3', 'CSM Corona - Sporting Ghimbav', '2026-11-14T08:00:00+00:00'), u15, vocab), false, 'echipele inversate = meciul retur');
+  assert.deepEqual(autoMatch([video('d4', 'Sporting Ghimbav - CSM Corona U15 Highlights', '2026-11-16T08:00:00+00:00')], [u15], fixtures), {});
+  assert.deepEqual(autoMatch([video('d5', 'Sporting Ghimbav - CSM Corona U15', '2026-11-14T08:00:00+00:00')], [u15], fixtures), { 1680855: 'd5' });
+});
+
+test('titlurile din feed sunt decodate (entitati numerice)', () => {
+  const xml = '<entry><yt:videoId>x1</yt:videoId><title>A &amp; B &#8211; C&#x27;s &quot;D&quot;</title><published>2026-01-01T00:00:00+00:00</published></entry>';
+  assert.equal(parseFeed(xml)[0].title, 'A & B – C\'s "D"');
+});

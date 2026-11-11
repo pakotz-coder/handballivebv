@@ -8,6 +8,9 @@ const streamsStore = () => getStore({ name: 'streams', consistency: 'strong' });
 
 const KEY = 'streams';
 
+// Erori al caror mesaj poate fi aratat administratorului (restul apar ca "Eroare neasteptata").
+export class UserError extends Error {}
+
 export async function readStreams() {
   return (await streamsStore().get(KEY, { type: 'json' })) || {};
 }
@@ -26,5 +29,5 @@ export async function updateStreams(mutate) {
     const result = await store.setJSON(KEY, streams, condition);
     if (!result || result.modified !== false) return streams;
   }
-  throw new Error('Nu am putut salva (prea multe modificari simultane). Incearca din nou.');
+  throw new UserError('Nu am putut salva (prea multe modificări simultane). Încearcă din nou.');
 }

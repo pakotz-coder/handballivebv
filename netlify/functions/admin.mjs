@@ -4,7 +4,7 @@ import { config as site } from '../../config/site.config.mjs';
 import * as auth from '../lib/auth.mjs';
 import { loadAllSeries, syncStreams, streamRecord, nowInRomania, findClub } from '../lib/model.mjs';
 import { loadVideos } from '../lib/youtube.mjs';
-import { updateStreams } from '../lib/store.mjs';
+import { updateStreams, UserError } from '../lib/store.mjs';
 import { loadCatalogue, loadCompetitionRaw } from '../lib/source.mjs';
 
 const json = (body, init = {}) => Response.json(body, { ...init, headers: { 'cache-control': 'no-store', ...(init.headers || {}) } });
@@ -47,7 +47,7 @@ async function state() {
     today, matches, videos: feed.videos, youtubeUrl: site.youtube.channelUrl,
     warnings: [
       ...series.filter((s) => s.error).map((s) => `${s.label}: ${s.error}`),
-      ...(feed.stale ? ['Lista de video-uri YouTube nu a putut fi actualizata.'] : []),
+      ...(feed.stale ? ['Lista de videoclipuri de pe YouTube nu a putut fi actualizată.'] : []),
     ],
   });
 }
@@ -64,7 +64,7 @@ async function toggle({ matchId, on }) {
       if (!streams[matchId]) return false;
       delete streams[matchId];
     } else {
-      if (!found || !found[1].brasov) throw new Error('Meciul nu a fost gasit in competitiile urmarite.');
+      if (!found || !found[1].brasov) throw new UserError('Meciul nu a fost găsit în competițiile urmărite.');
       streams[matchId] = { ...streamRecord(found[0], found[1], streams[matchId]), markedAt: Date.now() };
     }
   });
@@ -77,10 +77,10 @@ async function toggle({ matchId, on }) {
 async function setVideo({ matchId, videoId }) {
   const feed = await loadVideos();
   const video = videoId ? feed.videos.find((v) => v.id === videoId) : null;
-  if (videoId && !video) return fail(400, 'Video-ul nu mai apare in lista canalului.');
+  if (videoId && !video) return fail(400, 'Videoclipul nu mai apare în lista canalului.');
   await updateStreams((streams) => {
     const rec = streams[matchId];
-    if (!rec) throw new Error('Meciul nu este marcat ca transmis.');
+    if (!rec) throw new UserError('Meciul nu este marcat ca transmis.');
     streams[matchId] = video
       ? { ...rec, videoId: video.id, videoTitle: video.title, videoSource: 'manual', noAuto: false }
       : { ...rec, videoId: null, videoTitle: null, videoSource: null, noAuto: true };
@@ -116,36 +116,38 @@ async function seasonHelper() {
   return json({ season: site.season, competitions: out });
 }
 
-export default async (req) => {
+export default async (req, context) => {
   const route = new URL(req.url).pathname.replace(/^\/api\/admin\//, '');
   const isPost = req.method === 'POST';
-  if (isPost && !auth.sameOrigin(req)) return fail(403, 'Cerere respinsa.');
+  if (isPost && !auth.sameOrigin(req)) return fail(403, 'Cerere respinsă.');
   let body = {};
   if (isPost) {
-    try { body = await req.json(); } catch { return fail(400, 'Cerere invalida.'); }
+    try { body = await req.json(); } catch { body = null; }
+    if (!body || typeof body !== 'object') return fail(400, 'Cerere invalidă.');
   }
+  const ip = context?.ip || '';
 
   try {
     if (route === 'login' && isPost) {
-      if (!auth.passwordConfigured()) return fail(503, 'Parola de administrare nu este configurata (variabila ADMIN_PASSWORD in Netlify, minimum 8 caractere).');
-      if (!(await auth.loginAllowed())) return fail(429, 'Prea multe incercari gresite. Incearca din nou peste 15 minute.');
+      if (!auth.passwordConfigured()) return fail(503, 'Parola de administrare nu este configurată (variabila ADMIN_PASSWORD în Netlify, minimum 8 caractere).');
+      if (!(await auth.loginAllowed(ip))) return fail(429, 'Prea multe încercări greșite. Încearcă din nou peste 15 minute.');
       if (!auth.checkPassword(body.password)) {
-        await auth.recordFailedLogin();
-        return fail(401, 'Parola gresita.');
+        await auth.recordFailedLogin(ip);
+        return fail(401, 'Parolă greșită.');
       }
       return json({ ok: true }, { headers: { 'set-cookie': auth.sessionCookie() } });
     }
     if (route === 'logout' && isPost) return json({ ok: true }, { headers: { 'set-cookie': auth.clearCookie() } });
 
-    if (!auth.isAuthenticated(req)) return fail(401, 'Autentificare necesara.');
+    if (!auth.isAuthenticated(req)) return fail(401, 'Autentificare necesară.');
     if (route === 'state' && req.method === 'GET') return await state();
     if (route === 'toggle' && isPost) return await toggle(body);
     if (route === 'video' && isPost) return await setVideo(body);
     if (route === 'season' && req.method === 'GET') return await seasonHelper();
-    return fail(404, 'Ruta necunoscuta.');
+    return fail(404, 'Rută necunoscută.');
   } catch (err) {
     console.error(err);
-    return fail(500, err.message || 'Eroare neasteptata.');
+    return err instanceof UserError ? fail(400, err.message) : fail(500, 'A apărut o eroare neașteptată. Încearcă din nou.');
   }
 };
 

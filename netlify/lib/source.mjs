@@ -79,7 +79,7 @@ export function parseCompetition(text) {
 }
 
 async function fetchText(url) {
-  const res = await fetch(url, { signal: AbortSignal.timeout(15000), headers: { 'user-agent': 'HandbalLiveBV-site/1.0' } });
+  const res = await fetch(url, { signal: AbortSignal.timeout(8000), headers: { 'user-agent': 'HandbalLiveBV-site/1.0' } });
   if (!res.ok) throw new Error(`Sursa a raspuns ${res.status} pentru ${url}`);
   return res.text();
 }
@@ -122,13 +122,14 @@ export function normalizeSeries(comp, obj) {
 }
 
 const memory = new Map();
+const RETRY_MS = 2 * 60000; // dupa un esec, nu mai intrebam serverul federatiei 2 minute
 
 // Intoarce seria normalizata pentru o competitie urmarita. Foloseste cache-ul cat timp e proaspat;
-// daca sursa nu raspunde, serveste ultima varianta buna (stale: true).
+// daca sursa nu raspunde, serveste ultima varianta buna (stale: true) si asteapta inainte de a reincerca.
 export async function loadSeries(comp) {
   const key = `series-${comp.compId}-${comp.seriesId}`;
   const ttl = config.source.cacheMinutes * 60000;
-  const fresh = (e) => e && Date.now() - e.fetchedAt < ttl;
+  const fresh = (e) => e && Date.now() - (e.checkedAt ?? e.fetchedAt) < ttl;
   if (fresh(memory.get(key))) return memory.get(key);
   const store = cacheStore();
   const cached = await store.get(key, { type: 'json' });
@@ -144,8 +145,11 @@ export async function loadSeries(comp) {
     return entry;
   } catch (err) {
     console.error(`[sursa] ${key}: ${err.message}`);
-    if (cached) return { ...cached, stale: true };
-    throw err;
+    if (!cached) throw err;
+    const entry = { ...cached, stale: true, checkedAt: Date.now() - ttl + RETRY_MS };
+    await store.setJSON(key, entry).catch(() => {});
+    memory.set(key, entry);
+    return entry;
   }
 }
 

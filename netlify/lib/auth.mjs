@@ -1,14 +1,19 @@
 // Autentificarea administratorului: parola din variabila de mediu ADMIN_PASSWORD,
 // sesiune tinuta intr-un cookie semnat (HMAC-SHA256), fara stare pe server.
-import { createHmac, createHash, timingSafeEqual } from 'node:crypto';
+import { createHmac, createHash, scryptSync, timingSafeEqual } from 'node:crypto';
 import { cacheStore } from './store.mjs';
 
 const COOKIE = 'hlbv_admin';
 const DAYS = 60;
 
 const password = () => process.env.ADMIN_PASSWORD || '';
-// Cheia de semnare deriva din parola: schimbarea parolei invalideaza toate sesiunile.
-const signingKey = () => createHash('sha256').update(`hlbv-session:${password()}`).digest();
+// Cheia de semnare deriva din parola (scrypt, ca un cookie scurs sa nu ajute la ghicirea parolei):
+// schimbarea parolei invalideaza toate sesiunile.
+let derived = null;
+const signingKey = () => {
+  if (!derived || derived.from !== password()) derived = { from: password(), key: scryptSync(password(), 'hlbv-session-v1', 32) };
+  return derived.key;
+};
 const sign = (payload) => createHmac('sha256', signingKey()).update(payload).digest('base64url');
 
 const safeEqual = (a, b) => {
@@ -41,18 +46,20 @@ export function sameOrigin(req) {
   return !origin || origin === new URL(req.url).origin;
 }
 
-// Limiteaza incercarile de parola: cel mult 10 greseli la 15 minute, pe tot site-ul.
+// Limiteaza incercarile de parola: cel mult 10 greseli la 15 minute de pe aceeasi adresa IP
+// (pe adresa, ca un strain care ghiceste parole sa nu-l poata bloca pe administrator).
 const WINDOW = 15 * 60000;
 const MAX_FAILS = 10;
+const failKey = (ip) => `login-fails-${createHash('sha256').update(ip || 'necunoscut').digest('hex').slice(0, 16)}`;
 
-export async function loginAllowed() {
-  const entry = await cacheStore().get('login-fails', { type: 'json' });
+export async function loginAllowed(ip) {
+  const entry = await cacheStore().get(failKey(ip), { type: 'json' });
   return !entry || Date.now() - entry.since > WINDOW || entry.count < MAX_FAILS;
 }
 
-export async function recordFailedLogin() {
+export async function recordFailedLogin(ip) {
   const store = cacheStore();
-  const entry = await store.get('login-fails', { type: 'json' });
+  const entry = await store.get(failKey(ip), { type: 'json' });
   const next = !entry || Date.now() - entry.since > WINDOW ? { since: Date.now(), count: 1 } : { ...entry, count: entry.count + 1 };
-  await store.setJSON('login-fails', next);
+  await store.setJSON(failKey(ip), next);
 }

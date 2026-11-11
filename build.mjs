@@ -10,7 +10,7 @@ const pages = [
   { slug: 'arhiva', file: 'arhiva', nav: 'Arhivă', title: 'Arhiva meciurilor transmise — HandbalLiveBV', description: 'Toate meciurile transmise de HandbalLiveBV, cu înregistrările de pe YouTube.' },
   { slug: 'rezultate', file: 'rezultate', nav: 'Rezultate', title: 'Rezultate și clasamente — HandbalLiveBV', description: 'Rezultatele și clasamentele cluburilor brașovene în competițiile de junioare și în Divizia A feminin.' },
   { slug: 'cluburi', file: 'cluburi', nav: 'Cluburi', title: 'Cluburile brașovene — HandbalLiveBV', description: 'Cluburile de handbal din județul Brașov prezente în competițiile urmărite de HandbalLiveBV.' },
-  { slug: 'pentru-cluburi-si-parinti', file: 'pentru-cluburi-si-parinti', nav: 'Pentru cluburi și părinți', title: 'Pentru cluburi și părinți — HandbalLiveBV', description: 'Cum ceri o transmisie, regulile de filmare, acordul pentru minori și cum ceri ștergerea unui video.' },
+  { slug: 'pentru-cluburi-si-parinti', file: 'pentru-cluburi-si-parinti', nav: 'Pentru cluburi și părinți', title: 'Pentru cluburi și părinți — HandbalLiveBV', description: 'Cum ceri o transmisie, regulile de filmare, acordul pentru minori și cum ceri ștergerea unui videoclip.' },
   { slug: 'despre', file: 'despre', nav: 'Despre', title: 'Despre HandbalLiveBV', description: 'Cine face transmisiile HandbalLiveBV și de ce.' },
   { slug: 'admin', file: 'admin', nav: null, title: 'Administrare — HandbalLiveBV', description: '', script: 'admin.js', noindex: true },
 ];
@@ -37,9 +37,10 @@ const version = createHash('sha1').update(['css/site.css', 'js/site.js', 'js/adm
 // Daca lipseste, linkurile de contact duc la pagina de Facebook a proiectului.
 const email = (process.env.CONTACT_EMAIL || '').trim();
 const contact = (subject) => (email
-  ? `<a href="mailto:${email}?subject=${encodeURIComponent(subject)}">${email}</a>`
-  : `<a href="${config.facebookUrl}" rel="noopener">pagina noastră de Facebook</a> (mesaj privat, cu subiectul „${subject}”)`);
+  ? `la <a href="mailto:${email}?subject=${encodeURIComponent(subject)}">${email}</a>`
+  : `pe <a href="${config.facebookUrl}" rel="noopener">pagina noastră de Facebook</a> (mesaj privat, cu subiectul „${subject}”)`);
 
+const origin = (process.env.URL || '').replace(/\/$/, '');
 const layout = read('layout.html');
 for (const page of pages) {
   const path = `/${page.slug ? `${page.slug}/` : ''}`;
@@ -51,6 +52,7 @@ for (const page of pages) {
     .replace('{{content}}', read(`pages/${page.file}.html`))
     .replaceAll('{{title}}', page.title)
     .replaceAll('{{description}}', page.description)
+    .replaceAll('{{origin}}', origin)
     .replaceAll('{{path}}', path)
     .replaceAll('{{page}}', page.file)
     .replaceAll('{{nav}}', nav)

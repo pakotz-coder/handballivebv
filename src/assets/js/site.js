@@ -20,10 +20,14 @@ const longDate = fmt({ weekday: 'long', day: 'numeric', month: 'long' });
 const shortDate = fmt({ weekday: 'short', day: 'numeric', month: 'short' });
 const dateOf = (iso) => new Date(`${iso}T12:00:00Z`);
 const videoUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
+// „1 meci”, „5 meciuri”, „23 de meciuri” (de la 20 in sus se pune „de”).
+const count = (n, one, many) => `${n} ${n === 1 ? one : `${n % 100 === 0 || n % 100 >= 20 ? 'de ' : ''}${many}`}`;
 const place = (m) => [m.hall, m.city].filter(Boolean).join(', ') || 'sala se anunță';
 
 function when(m, today, format = shortDate) {
-  const day = m.date === today ? 'Astăzi' : format.format(dateOf(m.date));
+  // In arhiva, meciurile din alt an calendaristic isi arata si anul.
+  const year = m.date.slice(0, 4) === today.slice(0, 4) ? '' : ` ${m.date.slice(0, 4)}`;
+  const day = m.date === today ? 'Astăzi' : format.format(dateOf(m.date)) + year;
   return el('p', { class: 'match-when' }, el('strong', { text: day }), ` ${m.time || (m.played ? '' : 'ora se anunță')}`);
 }
 
@@ -103,7 +107,7 @@ function archive(data) {
     const shown = past.filter((s) => (!form.category.value || s.label === form.category.value)
       && (!form.club.value || s.homeClub === form.club.value || s.awayClub === form.club.value)
       && (!form.season.value || s.season === form.season.value));
-    $('#archive-count').textContent = past.length ? `${shown.length} ${shown.length === 1 ? 'meci' : 'meciuri'}` : '';
+    $('#archive-count').textContent = past.length ? count(shown.length, 'meci', 'meciuri') : '';
     fill('#archive', shown.length
       ? streamList(shown, data)
       : el('p', { class: 'notice', text: past.length ? 'Niciun meci pentru filtrele alese.' : 'Încă nu există meciuri în arhivă.' }));
@@ -133,6 +137,7 @@ function standingsTable(series) {
         el('td', { class: 'wide', text: `${r.gf}:${r.ga}` }),
         el('td', { class: 'pts', text: r.pts })))))),
     el('p', { class: 'legend', text: 'cluburi din județul Brașov' }),
+    el('p', { class: 'muted small', text: 'M = meciuri jucate · V = victorii · E = egaluri · Î = înfrângeri · Pct = puncte' }),
     penalised.length ? el('p', { class: 'muted', text: `* ${penalised.map((r) => `${r.name}: ${r.adj > 0 ? '+' : '−'}${Math.abs(r.adj)} ${Math.abs(r.adj) === 1 ? 'punct' : 'puncte'}`).join('; ')} (decizie a federației).` }) : null,
   ];
 }
@@ -195,7 +200,7 @@ function clubs(data) {
       el('p', { class: 'muted', text: club.city }),
       el('ul', {}, rows.map(([s, row]) => el('li', {},
         el('a', { href: `/rezultate/#${s.key}`, text: s.label }),
-        el('span', { text: `locul ${row.pos} · ${row.pts} ${row.pts === 1 ? 'punct' : 'puncte'}` })))),
+        el('span', { text: `locul ${row.pos} · ${count(row.pts, 'punct', 'puncte')}${s.verified ? '' : ' (neoficial)'}` })))),
       streamed ? el('a', { class: 'more', href: `/arhiva/?club=${club.slug}`, text: `Meciuri transmise (${streamed})` }) : null);
   }).filter(Boolean);
   fill('#clubs', cards.length ? el('ul', { class: 'cards' }, cards) : el('p', { class: 'notice', text: 'Datele oficiale nu sunt disponibile momentan.' }));
@@ -204,6 +209,9 @@ function clubs(data) {
 const pages = { acasa: ['#next-stream', home], program: ['#program', program], arhiva: ['#archive', archive], rezultate: ['#series', resultsPage], cluburi: ['#clubs', clubs] };
 
 async function start() {
+  // Pe telefon meniul se deruleaza orizontal: aducem in vedere pagina curenta.
+  const current = $('.site-nav [aria-current="page"]');
+  if (current) current.parentElement.parentElement.scrollLeft = Math.max(0, current.offsetLeft - 16);
   if (!pages[page]) return;
   const [target, render] = pages[page];
   try {

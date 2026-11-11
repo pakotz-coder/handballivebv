@@ -17,6 +17,7 @@ function el(tag, props, ...kids) {
 
 const shortDate = new Intl.DateTimeFormat('ro-RO', { timeZone: 'UTC', weekday: 'short', day: 'numeric', month: 'short' });
 const dayOf = (iso) => shortDate.format(new Date(`${iso}T12:00:00Z`));
+const count = (n, one, many) => `${n} ${n === 1 ? one : `${n % 100 === 0 || n % 100 >= 20 ? 'de ' : ''}${many}`}`;
 const addDays = (iso, n) => new Date(Date.parse(`${iso}T12:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
 
 let state = null;
@@ -58,7 +59,10 @@ async function change(path, body) {
     toast(err.message);
   }
   busy = false;
+  document.querySelectorAll('#panel button').forEach((b) => { b.disabled = false; });
   render();
+  // Dupa redesenare, focusul ramane pe butonul meciului la care s-a lucrat (pentru tastatura).
+  if (body.matchId) document.querySelector(`.toggle[data-id="${body.matchId}"]`)?.focus({ preventScroll: true });
 }
 
 function videoPicker(match) {
@@ -67,9 +71,15 @@ function videoPicker(match) {
     state.videos.map((v) => el('li', {}, el('button', { class: 'video-pick', type: 'button', onclick: () => pick(v.id) },
       el('img', { src: `https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`, alt: '', width: 96, height: 54, loading: 'lazy' }),
       el('span', {}, v.title, el('small', { text: `publicat ${dayOf(v.published.slice(0, 10))}` }))))),
-    state.videos.length ? null : el('li', { class: 'muted', text: 'Canalul nu are încă video-uri publice sau programate.' }),
-    match.videoId ? el('li', {}, el('button', { class: 'video-pick none', type: 'button', text: 'Fără video', onclick: () => pick(null) })) : null,
+    state.videos.length ? null : el('li', { class: 'muted', text: 'Canalul nu are încă videoclipuri publice sau transmisii programate.' }),
+    match.videoId ? el('li', {}, el('button', { class: 'video-pick none', type: 'button', text: 'Fără videoclip', onclick: () => pick(null) })) : null,
     el('li', {}, el('button', { class: 'video-pick none', type: 'button', text: 'Închide lista', onclick: () => { pickerFor = null; render(); } })));
+}
+
+// Un meci deja jucat este in arhiva: scoaterea lui cere o confirmare (se pierde si legatura cu videoclipul).
+function toggle(m) {
+  if (m.streamed && !m.upcoming && !window.confirm(`Scoți din arhivă meciul ${m.home} – ${m.away}?`)) return;
+  change('toggle', { matchId: m.id, on: !m.streamed });
 }
 
 function card(m) {
@@ -79,15 +89,15 @@ function card(m) {
     el('p', { class: 'a-when' }, el('strong', { text: m.date === state.today ? 'Astăzi' : dayOf(m.date) }), ` ${m.time || (m.played ? '' : 'ora se anunță')}`),
     el('p', { class: 'a-teams' }, m.home, el('br'), m.away),
     el('p', { class: 'a-meta', text: `${m.label} · etapa ${m.round} · ${hall}${scoreText}` }),
-    el('button', { class: 'toggle', type: 'button', 'aria-pressed': String(m.streamed), onclick: () => change('toggle', { matchId: m.id, on: !m.streamed }) },
+    el('button', { class: 'toggle', type: 'button', 'data-id': m.id, 'aria-pressed': String(m.streamed), onclick: () => toggle(m) },
       'Transmitem', el('small', { text: m.streamed ? 'Marcat. Apasă din nou pentru a anula.' : 'Apasă pentru a-l pune pe site.' })));
   if (m.streamed) {
     node.append(el('p', { class: 'video-line' }, m.videoId
-      ? `Video: ${m.videoTitle}${m.videoSource === 'auto' ? ' (legat automat)' : ''}`
-      : 'Niciun video legat încă. Se leagă singur când apare pe canal cu numele echipelor în titlu.'));
+      ? `Videoclip: ${m.videoTitle}${m.videoSource === 'auto' ? ' (legat automat)' : ''}`
+      : 'Niciun videoclip legat încă. Se leagă singur când apare pe canal cu numele echipelor în titlu.'));
     node.append(pickerFor === m.id
       ? videoPicker(m)
-      : el('button', { class: 'btn', type: 'button', text: m.videoId ? 'Schimbă video-ul' : 'Alege video-ul din listă', onclick: () => { pickerFor = m.id; render(); } }));
+      : el('button', { class: 'btn', type: 'button', text: m.videoId ? 'Schimbă videoclipul' : 'Alege videoclipul din listă', onclick: () => { pickerFor = m.id; render(); } }));
   }
   return node;
 }
@@ -102,7 +112,7 @@ function render() {
   $('#upcoming').replaceChildren(...(showAll ? upcoming : near).map(card));
   if (!upcoming.length) $('#upcoming').append(el('p', { class: 'muted', text: 'Niciun meci viitor al cluburilor brașovene în datele oficiale.' }));
   $('#show-all').hidden = showAll || near.length === upcoming.length;
-  $('#show-all').textContent = `Arată tot sezonul (${upcoming.length} meciuri)`;
+  $('#show-all').textContent = `Arată tot sezonul (${count(upcoming.length, 'meci', 'meciuri')})`;
   $('#recent').replaceChildren(...(showOld ? past : recent).map(card));
   if (!recent.length && !showOld) $('#recent').append(el('p', { class: 'muted', text: 'Niciun meci jucat în ultimele 14 zile.' }));
   $('#show-old').hidden = showOld || recent.length === past.length;

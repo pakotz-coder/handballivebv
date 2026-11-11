@@ -36,7 +36,7 @@ De acum, orice `git push` pe ramura principala republica site-ul.
 - Schimbarea parolei: modifici variabila in Netlify si pornesti un deploy nou. Toate sesiunile vechi
   devin invalide (cheia de semnare a cookie-ului deriva din parola).
 - Dupa autentificare, telefonul ramane conectat 60 de zile (cookie semnat, HttpOnly, Secure, SameSite=Strict).
-- Dupa 10 parole gresite, autentificarea se blocheaza 15 minute.
+- Dupa 10 parole gresite de pe aceeasi adresa de internet, autentificarea de pe acea adresa se blocheaza 15 minute.
 
 ## 3. Folosirea panoului (`/admin`)
 
@@ -45,15 +45,22 @@ De acum, orice `git push` pe ramura principala republica site-ul.
    Echipele, data, ora si sala vin din programul oficial; nu se tasteaza nimic.
 3. Apesi **Transmitem** la meciul pe care il transmiti. Apare imediat pe Acasa si in Program.
    Inca o apasare il scoate.
-4. Linkul YouTube se leaga singur cand pe canal apare un video (sau o transmisie programata) care are
-   in titlu ambele echipe si se potriveste ca data. Ca sa mearga fara greseli, pune in titlu numele
-   echipelor si, ideal, categoria si data, de exemplu:
-   `Sporting Ghimbav - CSM Corona Brasov | U15 | 15.11.2026`.
-   Daca site-ul nu e sigur, nu ghiceste: apesi **Alege video-ul din lista** si atingi video-ul corect.
-5. Dupa meci, scorul se completeaza singur din datele oficiale, iar meciul trece in Arhiva.
+4. Linkul YouTube se leaga singur cand pe canal apare un videoclip (sau o transmisie programata) care:
+   - are in titlu ambele echipe, **gazdele primele**, ca in programul oficial (ajunge un cuvant care
+     deosebeste echipa: `Sporting`, `Corona`, `Codlea`; `Magura` sau `Ghimbav` singure nu ajung);
+   - a fost creat cu cel mult 30 de zile inainte si cel mult 7 zile dupa meci;
+   - nu se potriveste cu niciun alt meci din program. Aceleasi cluburi joaca des si la U15, si la U17,
+     si la U19 in acelasi weekend, asa ca scrie mereu categoria in titlu (`U15`, `U17`, `U19` sau `J3`, `J2`, `J1`).
 
-Feed-ul public YouTube contine doar ultimele 15 video-uri **publice** ale canalului. Un video nelistat
-sau privat nu apare in lista.
+   Exemplu de titlu bun: `Sporting Ghimbav - CSM Corona Brasov | U15 | 15.11.2026`.
+   Daca site-ul nu e sigur, nu ghiceste: apesi **Alege videoclipul din lista** si atingi videoclipul corect.
+   Rezumatele (titluri cu „Highlights” sau „Rezumat”) nu se leaga automat, dar pot fi alese din lista.
+5. Dupa meci, scorul se completeaza singur din datele oficiale, iar meciul trece in Arhiva.
+6. Pentru meciurile transmise inainte de lansarea site-ului: **Arata toate meciurile jucate**, apoi
+   **Transmitem** la fiecare si alegi videoclipul din lista.
+
+Feed-ul public YouTube contine doar ultimele 15 videoclipuri **publice** ale canalului. Un videoclip
+nelistat sau privat nu apare in lista. Lista se reimprospateaza la 10 minute.
 
 ## 4. Adaugarea unei competitii sau a partii de baieti
 

@@ -73,6 +73,8 @@ const sameRecord = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 export async function syncStreams(series, videos) {
   const matchIndex = new Map();
   for (const s of series) for (const m of s.matches) matchIndex.set(m.id, [s, m]);
+  // Toate meciurile din program: un video care s-ar potrivi si cu alt meci nu se leaga automat.
+  const fixtures = [...matchIndex.values()].map(([s, m]) => ({ matchId: m.id, seriesKey: s.key, date: m.date, home: m.home.name, away: m.away.name }));
   const refresh = (streams) => {
     let changed = false;
     for (const [id, rec] of Object.entries(streams)) {
@@ -81,7 +83,7 @@ export async function syncStreams(series, videos) {
       const next = streamRecord(found[0], found[1], rec);
       if (!sameRecord(next, rec)) { streams[id] = next; changed = true; }
     }
-    const matched = autoMatch(videos, Object.values(streams));
+    const matched = autoMatch(videos, Object.values(streams), fixtures);
     for (const [id, videoId] of Object.entries(matched)) {
       const video = videos.find((v) => v.id === videoId);
       streams[id] = { ...streams[id], videoId, videoTitle: video.title, videoSource: 'auto' };
@@ -100,7 +102,8 @@ export async function buildPublicData() {
   const streams = await syncStreams(series, feed.videos);
   const today = nowInRomania().date;
   const list = Object.values(streams).map((s) => ({ ...s, upcoming: !s.played && s.date >= today }));
-  list.sort((a, b) => `${a.date}${a.time || ''}`.localeCompare(`${b.date}${b.time || ''}`));
+  // Meciurile fara ora anuntata vin dupa cele cu ora, in aceeasi zi (la fel ca in admin).
+  list.sort((a, b) => `${a.date}${a.time || '99'}`.localeCompare(`${b.date}${b.time || '99'}`));
   return {
     generatedAt: Date.now(),
     season: config.season,
