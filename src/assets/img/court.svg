@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 640" fill="none">
+  <!-- Semicercul de 6 m, linia punctata de 9 m, linia de 7 m si poarta (marcaj rosu). 1 m = 20 unitati. -->
+  <path d="M400 170 A120 120 0 0 0 280 290 L280 350 A120 120 0 0 0 400 470" stroke="#fff" stroke-opacity=".16" stroke-width="2"/>
+  <path d="M400 110 A180 180 0 0 0 220 290 L220 350 A180 180 0 0 0 400 530" stroke="#fff" stroke-opacity=".16" stroke-width="2" stroke-dasharray="14 12"/>
+  <path d="M260 310 L260 330" stroke="#fff" stroke-opacity=".16" stroke-width="2"/>
+  <path d="M397 290 L397 350" stroke="#E8001D" stroke-width="6"/>
+</svg>

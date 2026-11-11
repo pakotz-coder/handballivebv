@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{title}}</title>
+<meta name="description" content="{{description}}">
+{{robots}}
+<meta name="theme-color" content="#0B0B0C">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{title}}">
+<meta property="og:description" content="{{description}}">
+<meta property="og:image" content="/assets/img/og.jpg">
+<meta property="og:locale" content="ro_RO">
+<link rel="icon" href="/assets/img/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="/assets/img/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
+<link rel="preload" href="/assets/fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/assets/css/site.css?v={{v}}">
+<script src="/assets/js/{{script}}?v={{v}}" defer></script>
+</head>
+<body data-page="{{page}}">
+<a class="skip" href="#continut">Sari la conținut</a>
+<header class="site-header">
+  <div class="wrap header-row">
+    <a class="brand" href="/" aria-label="HandbalLiveBV, pagina principală">
+      <span>Handbal</span><span class="brand-live">Live</span><span class="brand-bv">BV</span>
+    </a>
+    <nav class="site-nav" aria-label="Navigare principală">
+      <ul>{{nav}}</ul>
+    </nav>
+  </div>
+</header>
+<main id="continut">
+{{content}}
+</main>
+<footer class="site-footer">
+  <div class="wrap">
+    <p><strong>HandbalLiveBV</strong> este un proiect comunitar, făcut voluntar. Transmisiile sunt gratuite.</p>
+    <p>Programul, rezultatele și clasamentele provin din datele oficiale ale Federației Române de Handbal.</p>
+    <ul class="footer-links">
+      <li><a href="{{youtube}}" rel="noopener">YouTube</a></li>
+      <li><a href="{{facebook}}" rel="noopener">Facebook</a></li>
+      <li><a href="/pentru-cluburi-si-parinti/">Pentru cluburi și părinți</a></li>
+      <li><a href="/pentru-cluburi-si-parinti/#stergere">Cere ștergerea unui video</a></li>
+    </ul>
+  </div>
+</footer>
+</body>
+</html>

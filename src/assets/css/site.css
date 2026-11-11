@@ -1,0 +1,185 @@
+/* HandbalLiveBV — identitate: fundal aproape negru, text alb, un singur accent rosu,
+   titluri Barlow Condensed 800, text Inter, liniile terenului de handbal ca singur decor. */
+@font-face { font-family: "Barlow Condensed"; font-weight: 800; font-display: swap; src: url("/assets/fonts/barlow-condensed-latin-800-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Barlow Condensed"; font-weight: 800; font-display: swap; src: url("/assets/fonts/barlow-condensed-latin-ext-800-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: "Inter"; font-weight: 100 900; font-display: swap; src: url("/assets/fonts/inter-latin-wght-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Inter"; font-weight: 100 900; font-display: swap; src: url("/assets/fonts/inter-latin-ext-wght-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+:root {
+  --bg: #0B0B0C;
+  --fg: #FFFFFF;
+  --accent: #E8001D;
+  --grey: #B8B8BC;
+  --grey-dim: #6E6E74;
+  --line: rgba(255, 255, 255, .14);
+  --display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
+  --body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-padding-top: 6rem; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 400 1rem/1.6 var(--body); }
+img { max-width: 100%; height: auto; display: block; }
+a { color: var(--fg); text-underline-offset: .2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 800; text-transform: uppercase; line-height: 1.08; margin: 0; letter-spacing: .005em; }
+h1 { font-size: clamp(2.6rem, 11vw, 5.5rem); }
+h2 { font-size: clamp(1.7rem, 6vw, 2.4rem); margin-bottom: 1rem; }
+h3 { font-size: 1.35rem; }
+p { margin: 0 0 1rem; }
+ul, ol { margin: 0 0 1rem; padding-left: 1.25rem; }
+
+.wrap { width: min(100% - 2rem, 65rem); margin-inline: auto; }
+.section { padding-block: 1.75rem; }
+.muted { color: var(--grey); }
+.skip { position: absolute; left: -999rem; top: 0; background: var(--fg); color: var(--bg); padding: .75rem 1rem; z-index: 10; }
+.skip:focus { left: 0; }
+/* Rosul trece pragul de contrast doar la text mare, de aceea eticheta e mare si ingrosata. */
+.eyebrow { color: var(--accent); font-weight: 700; font-size: 1.2rem; letter-spacing: .14em; text-transform: uppercase; margin-bottom: .75rem; }
+.lead { color: var(--grey); font-size: 1.125rem; max-width: 40rem; }
+
+/* Antet */
+.site-header { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
+.header-row { display: flex; flex-direction: column; gap: .35rem; padding-block: .7rem .2rem; }
+.brand { font: 800 1.7rem/1 var(--display); text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; align-self: flex-start; }
+.brand-live { color: var(--accent); }
+.brand-bv { background: var(--accent); color: var(--fg); padding: .08em .22em .04em; border-radius: 2px; }
+.site-nav ul { list-style: none; display: flex; gap: .25rem; margin: 0 -1rem; padding: 0 1rem; overflow-x: auto; scrollbar-width: none; }
+.site-nav ul::-webkit-scrollbar { display: none; }
+.site-nav a { display: block; white-space: nowrap; padding: .7rem .65rem; color: var(--grey); text-decoration: none; font-weight: 500; font-size: .95rem; border-bottom: 3px solid transparent; }
+.site-nav a:hover { color: var(--fg); }
+.site-nav a[aria-current="page"] { color: var(--fg); border-bottom-color: var(--accent); }
+@media (min-width: 62rem) {
+  .header-row { flex-direction: row; align-items: center; justify-content: space-between; padding-block: .4rem 0; }
+  .brand { align-self: center; }
+  .site-nav ul { margin: 0; padding: 0; overflow: visible; }
+  .site-nav a { padding-block: 1.1rem .9rem; }
+}
+
+/* Decor: liniile terenului, in dreapta */
+.hero, .page-head { background: url("/assets/img/court.svg") no-repeat right -4rem center / auto 135%; }
+.hero { padding-block: 2rem 2rem; border-bottom: 1px solid var(--line); }
+.hero h1 { max-width: 12ch; margin-bottom: 1.25rem; }
+.page-head { padding-block: 2.25rem 1rem; background-size: auto 170%; }
+.page-head h1 { margin-bottom: 1rem; font-size: clamp(2.4rem, 9vw, 4.25rem); }
+@media (min-width: 48rem) { .hero { padding-block: 5.5rem 4.5rem; background-position: right center; } .page-head { background-position: right 2rem center; } }
+
+.actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.5rem 0 0; }
+.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 3rem; padding: .6rem 1.15rem; border: 1px solid var(--grey-dim); border-radius: 3px; background: transparent; color: var(--fg); font: 600 1rem/1.2 var(--body); text-decoration: none; cursor: pointer; }
+.btn:hover { border-color: var(--fg); }
+.btn-primary { background: var(--accent); border-color: var(--accent); }
+.btn-primary:hover { border-color: var(--fg); }
+.btn[disabled] { opacity: .55; cursor: progress; }
+.more { font-weight: 600; }
+
+/* Meciuri */
+.match-list { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+.match { display: grid; gap: .35rem .9rem; padding: 1rem 0; border-bottom: 1px solid var(--line); }
+.match-when { font: 800 1.15rem/1.1 var(--display); text-transform: uppercase; letter-spacing: .03em; color: var(--grey); }
+.match-when strong { color: var(--fg); font-weight: 800; }
+.teams { display: grid; gap: .15rem; font-size: 1.06rem; }
+.team { display: flex; justify-content: space-between; gap: 1rem; color: var(--grey); }
+.team-name::before { content: ""; display: inline-block; width: .5rem; height: .5rem; margin-right: .5rem; vertical-align: .08em; }
+.team.is-bv { color: var(--fg); font-weight: 600; }
+.team.is-bv .team-name::before { background: var(--accent); }
+.score { font: 800 1.35rem/1 var(--display); color: var(--fg); min-width: 1.6rem; text-align: right; }
+.team.lost .score { color: var(--grey); }
+.match-meta { color: var(--grey); font-size: .9rem; margin: 0; }
+.match-link { font-weight: 600; justify-self: start; }
+.badge { display: inline-block; font: 800 .95rem/1 var(--display); letter-spacing: .08em; text-transform: uppercase; background: var(--accent); color: var(--fg); padding: .25em .5em .2em; border-radius: 2px; }
+@media (min-width: 48rem) {
+  .match { grid-template-columns: 9.5rem 1fr auto; align-items: center; }
+  .match-meta { grid-column: 2; }
+  .match-link { grid-column: 3; grid-row: 1 / span 2; justify-self: end; }
+}
+
+/* Urmatoarea transmisie */
+.next { border: 1px solid var(--line); border-left: 4px solid var(--accent); padding: 1.25rem 1.1rem; display: grid; gap: .6rem; }
+.next .match-when { font-size: 1.5rem; }
+.next-teams { font: 800 clamp(1.7rem, 7vw, 2.8rem)/1.05 var(--display); text-transform: uppercase; }
+.next-teams span { display: block; }
+.next-teams .vs { font-size: .5em; color: var(--grey-dim); margin: .15em 0; }
+
+/* Filtre, comutatoare */
+.filters { display: grid; gap: .75rem; margin-bottom: 1rem; }
+.filters label { display: grid; gap: .25rem; font-size: .9rem; color: var(--grey); }
+select, input[type="password"] { min-height: 3rem; width: 100%; padding: .5rem .75rem; background: var(--bg); color: var(--fg); border: 1px solid var(--grey-dim); border-radius: 3px; font: 400 1rem var(--body); }
+@media (min-width: 40rem) { .filters { grid-template-columns: repeat(3, 1fr); } }
+.segmented { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.5rem; }
+.segmented .btn[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.check { display: flex; align-items: center; gap: .6rem; min-height: 3rem; font-weight: 500; cursor: pointer; }
+.check input { width: 1.35rem; height: 1.35rem; accent-color: var(--accent); }
+
+/* Clasament */
+.table-scroll { overflow-x: auto; margin-bottom: .5rem; }
+table.standings { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.standings caption { text-align: left; padding-bottom: .6rem; }
+.standings caption strong { font: 800 1.5rem/1 var(--display); text-transform: uppercase; display: block; }
+.standings caption span { color: var(--grey); font-size: .88rem; }
+.standings th, .standings td { padding: .6rem .45rem; text-align: right; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.standings thead th { color: var(--grey); font-size: .8rem; font-weight: 600; }
+.standings th.name, .standings td.name { text-align: left; white-space: normal; width: 100%; font-weight: 400; color: var(--grey); }
+.standings td.pos { text-align: left; color: var(--grey); padding-left: .7rem; }
+.standings td.pts { font-weight: 700; color: var(--fg); }
+.standings tr.is-bv td.pos { box-shadow: inset 4px 0 0 var(--accent); color: var(--fg); }
+.standings tr.is-bv .name { color: var(--fg); font-weight: 600; }
+.standings abbr { text-decoration: none; }
+.wide { display: none; }
+@media (min-width: 34rem) { .wide { display: table-cell; } }
+.legend { color: var(--grey); font-size: .88rem; }
+.legend::before { content: ""; display: inline-block; width: .5rem; height: .5rem; background: var(--accent); margin-right: .5rem; }
+.round-title { font: 800 1.1rem/1 var(--display); text-transform: uppercase; letter-spacing: .06em; color: var(--grey); margin: 1.5rem 0 0; padding-bottom: .5rem; }
+.series-block { margin-bottom: 1rem; }
+.results-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .25rem 1rem; margin-top: 2rem; }
+.results-head h3 { font-size: 1.5rem; }
+
+/* Cluburi */
+.cards { display: grid; gap: 1rem; list-style: none; padding: 0; margin: 0; }
+@media (min-width: 40rem) { .cards { grid-template-columns: repeat(2, 1fr); } }
+.card { border: 1px solid var(--line); border-left: 4px solid var(--accent); padding: 1.1rem; }
+.card h2 { font-size: 1.6rem; margin-bottom: .2rem; }
+.card ul { list-style: none; padding: 0; margin: .75rem 0; }
+.card li { display: flex; justify-content: space-between; gap: 1rem; padding: .35rem 0; border-bottom: 1px solid var(--line); }
+.card li span:last-child { color: var(--grey); white-space: nowrap; }
+
+/* Text */
+.prose { max-width: 44rem; }
+.prose h2 { margin-top: 2rem; }
+.prose li { margin-bottom: .4rem; }
+.capture { margin: 1.5rem 0 0; }
+.capture img { width: 100%; border: 1px solid var(--line); }
+.capture figcaption { color: var(--grey); font-size: .88rem; margin-top: .5rem; }
+.notice { border: 1px solid var(--grey-dim); border-left: 4px solid var(--accent); padding: .8rem 1rem; }
+
+.site-footer { border-top: 1px solid var(--line); margin-top: 3rem; padding-block: 2rem 3rem; color: var(--grey); font-size: .92rem; }
+.site-footer strong { color: var(--fg); }
+.footer-links { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .25rem 1.25rem; margin: 1rem 0 0; }
+.footer-links a { display: inline-block; padding: .6rem 0; }
+
+/* Administrare: totul mare, pentru o singura mana pe telefon */
+.admin { padding-block: 1.5rem; max-width: 36rem; }
+.admin h1 { font-size: 2.6rem; margin-bottom: 1rem; }
+.admin h2 { margin-top: 2.25rem; }
+.login { display: grid; gap: .75rem; }
+.login input { min-height: 3.5rem; font-size: 1.15rem; }
+.btn-big { min-height: 3.75rem; width: 100%; font-size: 1.15rem; }
+.a-match { border: 1px solid var(--line); padding: 1rem; margin-bottom: .85rem; display: grid; gap: .55rem; }
+.a-match.on { border-color: var(--accent); border-left-width: 4px; }
+.a-when { font: 800 1.3rem/1.1 var(--display); text-transform: uppercase; color: var(--grey); }
+.a-when strong { color: var(--fg); }
+.a-teams { font-size: 1.15rem; font-weight: 600; line-height: 1.35; }
+.a-meta { color: var(--grey); font-size: .92rem; margin: 0; }
+.toggle { min-height: 4rem; width: 100%; font: 800 1.6rem/1 var(--display); text-transform: uppercase; letter-spacing: .04em; border: 2px solid var(--grey-dim); border-radius: 3px; background: transparent; color: var(--fg); cursor: pointer; }
+.toggle[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
+.toggle small { display: block; font: 500 .8rem/1.3 var(--body); text-transform: none; letter-spacing: 0; margin-top: .2rem; }
+.video-line { font-size: .95rem; margin: 0; }
+.video-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
+.video-pick { display: grid; grid-template-columns: 6rem 1fr; gap: .75rem; align-items: center; width: 100%; min-height: 4rem; padding: .5rem; text-align: left; background: transparent; color: var(--fg); border: 1px solid var(--grey-dim); border-radius: 3px; font: 500 .98rem/1.3 var(--body); cursor: pointer; }
+.video-pick img { width: 6rem; aspect-ratio: 16 / 9; object-fit: cover; }
+.video-pick small { display: block; color: var(--grey); }
+.video-pick.none { grid-template-columns: 1fr; text-align: center; }
+.toast { position: fixed; left: 1rem; right: 1rem; bottom: 1rem; margin: 0 auto; max-width: 34rem; background: var(--fg); color: var(--bg); padding: .9rem 1rem; border-radius: 3px; font-weight: 600; }
+pre.config { white-space: pre-wrap; word-break: break-word; border: 1px solid var(--line); padding: .9rem; font-size: .85rem; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }

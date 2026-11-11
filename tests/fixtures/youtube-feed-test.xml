@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- FEED DE TEST, INVENTAT: cele doua video-uri reale ale canalului (11.11.2026) plus o transmisie programata
+     fictiva pentru meciul real 1680855, ca sa putem verifica legarea automata. Pornire: MOCK_FEED=youtube-feed-test.xml npm run mock -->
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <entry>
+  <yt:videoId>TEST0000001</yt:videoId>
+  <title>ACS Sporting Ghimbav - CSM Corona Brașov | U15 Junioare | 15.11.2026</title>
+  <published>2026-11-11T10:00:00+00:00</published>
+  <media:group><media:description>Transmisie de test &amp; verificare</media:description></media:group>
+ </entry>
+ <entry>
+  <yt:videoId>52X4uuWOBwE</yt:videoId>
+  <title>CS Rapid J2   -  CSM Corona J2   Highlights</title>
+  <published>2026-03-23T15:25:26+00:00</published>
+  <media:group><media:description>CS Rapid J2   -  CSM Corona J2  
+ 22.08.2025</media:description></media:group>
+ </entry>
+ <entry>
+  <yt:videoId>EzGiSVRi4Is</yt:videoId>
+  <title>Handbal Live Live Stream</title>
+  <published>2026-02-16T06:08:40+00:00</published>
+  <media:group><media:description></media:description></media:group>
+ </entry>
+</feed>

@@ -1,0 +1,33 @@
+<div class="wrap admin" id="admin">
+  <h1>Administrare</h1>
+
+  <form id="login" class="login" hidden>
+    <label for="password">Parolă</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+    <button class="btn btn-primary btn-big" type="submit">Intră</button>
+    <p class="notice" id="login-error" role="alert" hidden></p>
+  </form>
+
+  <div id="panel" hidden>
+    <p class="muted">Apasă „Transmitem” la meciurile pe care le transmiți. Apar imediat pe site. Încă o apăsare anulează.</p>
+    <p class="notice" id="warnings" hidden></p>
+    <section aria-labelledby="t-upcoming">
+      <h2 id="t-upcoming">Urmează</h2>
+      <div id="upcoming"></div>
+      <button class="btn btn-big" type="button" id="show-all" hidden>Arată tot sezonul</button>
+    </section>
+    <section aria-labelledby="t-recent">
+      <h2 id="t-recent">Jucate recent și transmise</h2>
+      <div id="recent"></div>
+      <button class="btn btn-big" type="button" id="show-old" hidden>Arată toate meciurile jucate</button>
+    </section>
+    <section aria-labelledby="t-season">
+      <h2 id="t-season">Sezon nou</h2>
+      <p class="muted">O dată pe an, când începe un sezon nou: caută aici numerele noilor competiții și trece-le în fișierul de configurare (vezi README).</p>
+      <button class="btn btn-big" type="button" id="season-btn">Caută competițiile noului sezon</button>
+      <div id="season-out"></div>
+    </section>
+    <p><button class="btn" type="button" id="logout">Ieși din cont</button></p>
+  </div>
+  <p class="toast" id="toast" role="status" aria-live="polite" hidden></p>
+</div>

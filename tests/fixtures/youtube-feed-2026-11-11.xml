@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns:yt="http://www.youtube.com/xml/schemas/2015" xmlns:media="http://search.yahoo.com/mrss/" xmlns="http://www.w3.org/2005/Atom">
+ <link rel="self" href="http://www.youtube.com/feeds/videos.xml?channel_id=UCKtWh5QrizDUeEcaS6RGA7g"/>
+ <id>yt:channel:KtWh5QrizDUeEcaS6RGA7g</id>
+ <yt:channelId>KtWh5QrizDUeEcaS6RGA7g</yt:channelId>
+ <title>Handbal LiveBV</title>
+ <link rel="alternate" href="https://www.youtube.com/channel/UCKtWh5QrizDUeEcaS6RGA7g"/>
+ <author>
+  <name>Handbal LiveBV</name>
+  <uri>https://www.youtube.com/channel/UCKtWh5QrizDUeEcaS6RGA7g</uri>
+ </author>
+ <published>2025-10-21T09:34:16+00:00</published>
+ <entry>
+  <id>yt:video:52X4uuWOBwE</id>
+  <yt:videoId>52X4uuWOBwE</yt:videoId>
+  <yt:channelId>UCKtWh5QrizDUeEcaS6RGA7g</yt:channelId>
+  <title>CS Rapid J2   -  CSM Corona J2   Highlights</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=52X4uuWOBwE"/>
+  <author>
+   <name>Handbal LiveBV</name>
+   <uri>https://www.youtube.com/channel/UCKtWh5QrizDUeEcaS6RGA7g</uri>
+  </author>
+  <published>2026-03-23T15:25:26+00:00</published>
+  <updated>2026-10-01T04:11:35+00:00</updated>
+  <media:group>
+   <media:title>CS Rapid J2   -  CSM Corona J2   Highlights</media:title>
+   <media:content url="https://www.youtube.com/v/52X4uuWOBwE?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/52X4uuWOBwE/hqdefault.jpg" width="480" height="360"/>
+   <media:description>CS Rapid J2   -  CSM Corona J2  
+ 22.08.2025</media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="59"/>
+   </media:community>
+  </media:group>
+ </entry>
+ <entry>
+  <id>yt:video:EzGiSVRi4Is</id>
+  <yt:videoId>EzGiSVRi4Is</yt:videoId>
+  <yt:channelId>UCKtWh5QrizDUeEcaS6RGA7g</yt:channelId>
+  <title>Handbal Live Live Stream</title>
+  <link rel="alternate" href="https://www.youtube.com/watch?v=EzGiSVRi4Is"/>
+  <author>
+   <name>Handbal LiveBV</name>
+   <uri>https://www.youtube.com/channel/UCKtWh5QrizDUeEcaS6RGA7g</uri>
+  </author>
+  <published>2026-02-16T06:08:40+00:00</published>
+  <updated>2026-10-25T19:43:06+00:00</updated>
+  <media:group>
+   <media:title>Handbal Live Live Stream</media:title>
+   <media:content url="https://www.youtube.com/v/EzGiSVRi4Is?version=3" type="application/x-shockwave-flash" width="640" height="390"/>
+   <media:thumbnail url="https://i2.ytimg.com/vi/EzGiSVRi4Is/hqdefault.jpg" width="480" height="360"/>
+   <media:description></media:description>
+   <media:community>
+    <media:starRating count="0" average="0.00" min="1" max="5"/>
+    <media:statistics views="0"/>
+   </media:community>
+  </media:group>
+ </entry>
+</feed>
