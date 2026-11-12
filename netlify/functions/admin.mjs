@@ -1,9 +1,10 @@
-// /api/admin/* — panoul de administrare: autentificare, marcarea meciurilor transmise, legarea video-urilor.
+// /api/admin/* — panoul de administrare: autentificare, marcarea meciurilor transmise, legarea video-urilor
+// (din lista canalului sau cu un link de YouTube de pe orice canal).
 import { purgeCache } from '@netlify/functions';
 import { config as site } from '../../config/site.config.mjs';
 import * as auth from '../lib/auth.mjs';
 import { loadAllSeries, syncStreams, streamRecord, nowInRomania, findClub } from '../lib/model.mjs';
-import { loadVideos } from '../lib/youtube.mjs';
+import { loadVideos, parseYoutubeLink, videoInfo } from '../lib/youtube.mjs';
 import { updateStreams, UserError } from '../lib/store.mjs';
 import { loadCatalogue, loadCompetitionRaw } from '../lib/source.mjs';
 
@@ -30,6 +31,7 @@ async function state() {
         hall: m.hall, city: m.city, home: m.home.name, away: m.away.name, played: m.played, score: m.score,
         upcoming: !m.played && m.date >= today,
         streamed: Boolean(rec), videoId: rec?.videoId || null, videoTitle: rec?.videoTitle || null, videoSource: rec?.videoSource || null,
+        videoUrl: rec?.videoUrl || null, videoChannel: rec?.videoChannel || null,
       });
     }
   }
@@ -40,6 +42,7 @@ async function state() {
       id: rec.matchId, label: rec.label, category: rec.category, round: rec.round, date: rec.date, time: rec.time,
       hall: rec.hall, city: rec.city, home: rec.home, away: rec.away, played: rec.played, score: rec.score,
       upcoming: false, streamed: true, videoId: rec.videoId || null, videoTitle: rec.videoTitle || null, videoSource: rec.videoSource || null,
+      videoUrl: rec.videoUrl || null, videoChannel: rec.videoChannel || null,
     });
   }
   matches.sort((a, b) => `${a.date}${a.time || '99'}`.localeCompare(`${b.date}${b.time || '99'}`));
@@ -82,8 +85,26 @@ async function setVideo({ matchId, videoId }) {
     const rec = streams[matchId];
     if (!rec) throw new UserError('Meciul nu este marcat ca transmis.');
     streams[matchId] = video
-      ? { ...rec, videoId: video.id, videoTitle: video.title, videoSource: 'manual', noAuto: false }
-      : { ...rec, videoId: null, videoTitle: null, videoSource: null, noAuto: true };
+      ? { ...rec, videoId: video.id, videoUrl: null, videoTitle: video.title, videoChannel: null, videoSource: 'manual', noAuto: false }
+      : { ...rec, videoId: null, videoUrl: null, videoTitle: null, videoChannel: null, videoSource: null, noAuto: true };
+  });
+  await publish();
+  return state();
+}
+
+// Link de YouTube lipit de administrator: transmisia poate fi pe orice canal, nu doar pe al nostru.
+// noAuto: un link pus de mana nu mai e inlocuit de potrivirea automata.
+async function setLink({ matchId, url }) {
+  const link = parseYoutubeLink(url);
+  if (!link) return fail(400, 'Acesta nu este un link de YouTube. Copiază linkul din YouTube (Distribuie → Copiază linkul) și lipește-l aici.');
+  const info = link.videoId ? await videoInfo(link.url) : null;
+  await updateStreams((streams) => {
+    const rec = streams[matchId];
+    if (!rec) throw new UserError('Meciul nu este marcat ca transmis.');
+    streams[matchId] = {
+      ...rec, videoId: link.videoId, videoUrl: link.url, videoTitle: info?.title || null, videoChannel: info?.channel || null,
+      videoSource: 'link', noAuto: true,
+    };
   });
   await publish();
   return state();
@@ -143,6 +164,7 @@ export default async (req, context) => {
     if (route === 'state' && req.method === 'GET') return await state();
     if (route === 'toggle' && isPost) return await toggle(body);
     if (route === 'video' && isPost) return await setVideo(body);
+    if (route === 'link' && isPost) return await setLink(body);
     if (route === 'season' && req.method === 'GET') return await seasonHelper();
     return fail(404, 'Rută necunoscută.');
   } catch (err) {

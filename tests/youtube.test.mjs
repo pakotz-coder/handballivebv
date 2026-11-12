@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseFeed, isCandidate, autoMatch } from '../netlify/lib/youtube.mjs';
+import { parseFeed, isCandidate, autoMatch, parseYoutubeLink } from '../netlify/lib/youtube.mjs';
 import { youtubeFeed } from './fixtures.mjs';
 
 // Meciuri reale din programul oficial (instantaneul din 11.11.2026), in forma in care sunt salvate ca "transmise".
@@ -107,4 +107,40 @@ test('anul din data conteaza, ordinea echipelor conteaza, rezumatele nu se leaga
 test('titlurile din feed sunt decodate (entitati numerice)', () => {
   const xml = '<entry><yt:videoId>x1</yt:videoId><title>A &amp; B &#8211; C&#x27;s &quot;D&quot;</title><published>2026-01-01T00:00:00+00:00</published></entry>';
   assert.equal(parseFeed(xml)[0].title, 'A & B – C\'s "D"');
+});
+
+test('link de YouTube lipit in admin: orice forma de link catre un videoclip devine adresa curata', () => {
+  const clean = { videoId: 'dQw4w9WgXcQ', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' };
+  for (const link of [
+    'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    'https://youtu.be/dQw4w9WgXcQ?si=AbCdEfGh123',
+    'https://youtube.com/live/dQw4w9WgXcQ?feature=share',
+    'https://m.youtube.com/watch?v=dQw4w9WgXcQ&list=PLabc&index=2',
+    'https://www.youtube.com/shorts/dQw4w9WgXcQ',
+    'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    'http://youtube.com/watch?v=dQw4w9WgXcQ',
+    '  youtu.be/dQw4w9WgXcQ  ',
+  ]) assert.deepEqual(parseYoutubeLink(link), clean, link);
+  assert.equal(parseYoutubeLink('https://youtu.be/dQw4w9WgXcQ?t=90').url, 'https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=90s');
+});
+
+test('link catre un canal sau un playlist (fara videoclip anume) este acceptat', () => {
+  assert.deepEqual(parseYoutubeLink('https://www.youtube.com/@AltCanal/live?si=x'), { videoId: null, url: 'https://www.youtube.com/@AltCanal/live' });
+  assert.deepEqual(parseYoutubeLink('https://youtube.com/channel/UCKtWh5QrizDUeEcaS6RGA7g/'), { videoId: null, url: 'https://www.youtube.com/channel/UCKtWh5QrizDUeEcaS6RGA7g' });
+  assert.deepEqual(parseYoutubeLink('https://www.youtube.com/playlist?list=PL123_abc-9'), { videoId: null, url: 'https://www.youtube.com/playlist?list=PL123_abc-9' });
+});
+
+test('ce nu e link de YouTube este refuzat', () => {
+  for (const bad of [
+    '', null, undefined, 'salut', 'https://www.facebook.com/watch?v=dQw4w9WgXcQ', 'https://youtube.com.evil.example/watch?v=dQw4w9WgXcQ',
+    'https://evil.example/?u=youtube.com/watch?v=dQw4w9WgXcQ', 'https://user:pw@youtube.com/watch?v=dQw4w9WgXcQ', 'javascript:alert(1)',
+    'https://www.youtube.com/', 'https://www.youtube.com/watch', 'https://www.youtube.com/watch?v=prea-scurt', 'https://youtu.be/',
+    'https://www.youtube.com/playlist', 'https://youtu.be/dQw4w9WgXcQ si text',
+  ]) assert.equal(parseYoutubeLink(bad), null, String(bad));
+});
+
+test('un meci cu link pus de mana nu mai e legat automat de alt videoclip', () => {
+  const v = video('aaa', 'Sporting Ghimbav - CSM Corona Brașov | U15 Junioare | 15.11.2026', '2026-11-10T08:00:00+00:00');
+  const linked = { ...u15, videoId: null, videoUrl: 'https://www.youtube.com/@AltCanal/live', videoSource: 'link', noAuto: true };
+  assert.deepEqual(autoMatch([v], [linked, u17]), {});
 });

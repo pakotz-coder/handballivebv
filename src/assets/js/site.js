@@ -20,6 +20,8 @@ const longDate = fmt({ weekday: 'long', day: 'numeric', month: 'long' });
 const shortDate = fmt({ weekday: 'short', day: 'numeric', month: 'short' });
 const dateOf = (iso) => new Date(`${iso}T12:00:00Z`);
 const videoUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
+// Linkul pus de mana in admin (poate fi pe alt canal) are intaietate fata de videoclipul din lista canalului.
+const streamUrl = (s) => s.videoUrl || (s.videoId ? videoUrl(s.videoId) : null);
 // „1 meci”, „5 meciuri”, „23 de meciuri” (de la 20 in sus se pune „de”).
 const count = (n, one, many) => `${n} ${n === 1 ? one : `${n % 100 === 0 || n % 100 >= 20 ? 'de ' : ''}${many}`}`;
 const place = (m) => [m.hall, m.city].filter(Boolean).join(', ') || 'sala se anunță';
@@ -40,8 +42,9 @@ function teams(home, away, score) {
 
 // Un meci transmis (din lista streams) ca rand de lista.
 function streamItem(s, data) {
-  const link = s.videoId
-    ? el('a', { class: 'match-link', href: videoUrl(s.videoId), rel: 'noopener', text: s.upcoming ? 'Urmărește pe YouTube' : 'Vezi înregistrarea' })
+  const url = streamUrl(s);
+  const link = url
+    ? el('a', { class: 'match-link', href: url, rel: 'noopener', text: s.upcoming ? 'Urmărește pe YouTube' : s.videoId ? 'Vezi înregistrarea' : 'Vezi pe YouTube' })
     : s.upcoming
       ? el('a', { class: 'match-link', href: data.youtubeUrl, rel: 'noopener', text: 'Canalul de YouTube' })
       : el('span', { class: 'match-link muted', text: 'Înregistrarea nu e încă disponibilă' });
@@ -71,7 +74,7 @@ function home(data) {
       el('p', { class: 'next-teams' }, el('span', { text: next.home }), el('span', { class: 'vs', text: 'vs' }), el('span', { text: next.away })),
       el('p', { class: 'match-meta', text: `${next.label} · ${place(next)}` }),
       el('p', { class: 'actions' },
-        el('a', { class: 'btn btn-primary', rel: 'noopener', href: next.videoId ? videoUrl(next.videoId) : data.youtubeUrl, text: 'Urmărește pe YouTube' }),
+        el('a', { class: 'btn btn-primary', rel: 'noopener', href: streamUrl(next) || data.youtubeUrl, text: 'Urmărește pe YouTube' }),
         upcoming.length > 1 ? el('a', { class: 'btn', href: '/program/', text: `Tot programul (${upcoming.length})` }) : null)));
   } else {
     fill('#next-stream', el('p', { class: 'notice', text: 'Nicio transmisie programată în acest moment. Meciurile noi apar aici imediat ce sunt confirmate.' }));
