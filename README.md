@@ -150,6 +150,12 @@ build.mjs                  construieste dist/
 tests/                     teste si instantaneul de date din 11.11.2026
 ```
 
+Tema luminoasa / intunecata: butonul din antet („Luminos” / „Intunecat”). Implicit site-ul e intunecat;
+alegerea fiecarui vizitator se tine minte in browserul lui. Culorile celor doua teme sunt la inceputul
+`src/assets/css/site.css` (`:root` si `html[data-theme="light"]`); logica este in `src/assets/js/theme.js`,
+incarcat in `<head>` ca pagina sa nu clipeasca in tema cealalta. Decorul terenului are doua variante:
+`court.svg` (linii albe) si `court-light.svg` (linii inchise).
+
 ## 9. Ce nu contine site-ul
 
 Proiect comunitar, separat de orice activitate comerciala: fara competitii de seniori in afara de

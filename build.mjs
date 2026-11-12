@@ -31,7 +31,7 @@ for (const f of [
 ]) cpSync(new URL(`./node_modules/${f}`, import.meta.url), new URL(`assets/fonts/${f.split('/').pop()}`, dist));
 
 // Versiune pentru CSS/JS, ca browserele sa ia fisierele noi dupa fiecare publicare.
-const version = createHash('sha1').update(['css/site.css', 'js/site.js', 'js/admin.js'].map((f) => read(`assets/${f}`)).join('')).digest('hex').slice(0, 8);
+const version = createHash('sha1').update(['css/site.css', 'js/site.js', 'js/admin.js', 'js/theme.js'].map((f) => read(`assets/${f}`)).join('')).digest('hex').slice(0, 8);
 
 // Adresa de contact vine din variabila de mediu CONTACT_EMAIL (setata in Netlify).
 // Daca lipseste, linkurile de contact duc la pagina de Facebook a proiectului.
