@@ -24,6 +24,8 @@ let state = null;
 let showAll = false;
 let showOld = false;
 let pickerFor = null; // meciul pentru care e deschisa lista de video-uri
+let linkFor = null; // meciul pentru care e deschis campul de link YouTube
+let linkDraft = ''; // ce e scris in camp (pastrat daca serverul refuza linkul)
 let busy = false;
 
 function toast(message) {
@@ -55,6 +57,9 @@ async function change(path, body) {
   try {
     state = await api(path, body);
     pickerFor = null;
+    linkFor = null;
+    linkDraft = '';
+    $('#toast').hidden = true; // un mesaj de eroare mai vechi nu ramane peste o salvare reusita
   } catch (err) {
     toast(err.message);
   }
@@ -72,8 +77,48 @@ function videoPicker(match) {
       el('img', { src: `https://i.ytimg.com/vi/${v.id}/mqdefault.jpg`, alt: '', width: 96, height: 54, loading: 'lazy' }),
       el('span', {}, v.title, el('small', { text: `publicat ${dayOf(v.published.slice(0, 10))}` }))))),
     state.videos.length ? null : el('li', { class: 'muted', text: 'Canalul nu are încă videoclipuri publice sau transmisii programate.' }),
-    match.videoId ? el('li', {}, el('button', { class: 'video-pick none', type: 'button', text: 'Fără videoclip', onclick: () => pick(null) })) : null,
+    match.videoId || match.videoUrl ? el('li', {}, el('button', { class: 'video-pick none', type: 'button', text: 'Fără videoclip', onclick: () => pick(null) })) : null,
     el('li', {}, el('button', { class: 'video-pick none', type: 'button', text: 'Închide lista', onclick: () => { pickerFor = null; render(); } })));
+}
+
+// Camp pentru un link de YouTube de pe orice canal (transmisia nu e mereu pe canalul nostru).
+// Pe telefon: copiezi linkul in YouTube (Distribuie -> Copiaza linkul), apoi „Lipește linkul copiat”.
+function linkForm(match) {
+  const input = el('input', {
+    id: `link-${match.id}`, type: 'url', inputmode: 'url', autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false',
+    placeholder: 'https://youtu.be/…', value: linkDraft, required: true, oninput: (e) => { linkDraft = e.target.value; },
+  });
+  const paste = async () => {
+    try {
+      const text = (await navigator.clipboard.readText()).trim();
+      if (!text) throw new Error('gol');
+      input.value = linkDraft = text;
+    } catch {
+      toast('Nu am putut citi linkul copiat. Ține apăsat în câmp și alege „Lipește”.');
+      input.focus();
+    }
+  };
+  const close = () => { linkFor = null; linkDraft = ''; render(); };
+  return el('form', { class: 'link-form', novalidate: true, onsubmit: (e) => {
+    e.preventDefault();
+    linkDraft = input.value.trim();
+    if (!linkDraft) { toast('Lipește mai întâi linkul de YouTube.'); return; }
+    change('link', { matchId: match.id, url: linkDraft });
+  } },
+  el('label', { for: `link-${match.id}`, text: 'Link de YouTube (de pe orice canal)' }),
+  input,
+  navigator.clipboard?.readText ? el('button', { class: 'btn', type: 'button', text: 'Lipește linkul copiat', onclick: paste }) : null,
+  el('button', { class: 'btn btn-primary', type: 'submit', text: 'Salvează linkul' }),
+  match.videoId || match.videoUrl ? el('button', { class: 'btn', type: 'button', text: 'Fără videoclip', onclick: () => change('video', { matchId: match.id, videoId: null }) }) : null,
+  el('button', { class: 'btn', type: 'button', text: 'Renunță', onclick: close }));
+}
+
+// Ce videoclip e legat acum de meci, pe intelesul administratorului.
+function videoLine(m) {
+  if (!m.videoId && !m.videoUrl) return 'Niciun videoclip legat încă. Se leagă singur când apare pe canalul nostru cu numele echipelor în titlu. Pentru alt canal, pune linkul.';
+  if (m.videoSource !== 'link') return `Videoclip: ${m.videoTitle}${m.videoSource === 'auto' ? ' (legat automat)' : ''}`;
+  const shown = m.videoUrl.replace('https://www.', '');
+  return `Link pus de tine: ${m.videoTitle || shown}${m.videoChannel ? ` · canalul ${m.videoChannel}` : ''}${m.videoTitle ? ` · ${shown}` : ''}`;
 }
 
 // Un meci deja jucat este in arhiva: scoaterea lui cere o confirmare (se pierde si legatura cu videoclipul).
@@ -92,12 +137,15 @@ function card(m) {
     el('button', { class: 'toggle', type: 'button', 'data-id': m.id, 'aria-pressed': String(m.streamed), onclick: () => toggle(m) },
       'Transmitem', el('small', { text: m.streamed ? 'Marcat. Apasă din nou pentru a anula.' : 'Apasă pentru a-l pune pe site.' })));
   if (m.streamed) {
-    node.append(el('p', { class: 'video-line' }, m.videoId
-      ? `Videoclip: ${m.videoTitle}${m.videoSource === 'auto' ? ' (legat automat)' : ''}`
-      : 'Niciun videoclip legat încă. Se leagă singur când apare pe canal cu numele echipelor în titlu.'));
-    node.append(pickerFor === m.id
-      ? videoPicker(m)
-      : el('button', { class: 'btn', type: 'button', text: m.videoId ? 'Schimbă videoclipul' : 'Alege videoclipul din listă', onclick: () => { pickerFor = m.id; render(); } }));
+    const linked = m.videoId || m.videoUrl;
+    node.append(el('p', { class: 'video-line', text: videoLine(m) }));
+    if (pickerFor === m.id) node.append(videoPicker(m));
+    else if (linkFor === m.id) node.append(linkForm(m));
+    else {
+      node.append(
+        el('button', { class: 'btn', type: 'button', text: linked ? 'Schimbă videoclipul (din lista canalului)' : 'Alege videoclipul din listă', onclick: () => { pickerFor = m.id; linkFor = null; render(); } }),
+        el('button', { class: 'btn', type: 'button', text: linked ? 'Schimbă cu un link de YouTube' : 'Pune un link de YouTube (orice canal)', onclick: () => { linkFor = m.id; linkDraft = ''; pickerFor = null; render(); } }));
+    }
   }
   return node;
 }

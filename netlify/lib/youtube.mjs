@@ -48,6 +48,51 @@ export async function loadVideos() {
   }
 }
 
+// Un link de YouTube lipit de administrator: transmisia poate fi si pe alt canal decat al nostru.
+// Accepta orice forma (watch, youtu.be, /live/, /shorts/, /embed/, canal, playlist) si intoarce o adresa
+// curata pe www.youtube.com, fara parametrii de urmarire. null = nu e un link de YouTube.
+export function parseYoutubeLink(input) {
+  let text = String(input ?? '').trim();
+  if (!text || /\s/.test(text)) return null;
+  if (!/^https?:\/\//i.test(text)) text = `https://${text}`;
+  let url;
+  try { url = new URL(text); } catch { return null; }
+  if (url.username || url.password || url.port) return null;
+  const host = url.hostname.toLowerCase().replace(/^(www|m|music)\./, '');
+  const [first = '', second = ''] = url.pathname.split('/').filter(Boolean);
+  const VIDEO_PATHS = ['live', 'embed', 'shorts', 'v'];
+  let id = null;
+  if (host === 'youtu.be') id = first;
+  else if (host !== 'youtube.com') return null;
+  else if (first === 'watch') id = url.searchParams.get('v') ?? '';
+  else if (VIDEO_PATHS.includes(first)) id = second;
+  if (id !== null) {
+    if (!/^[\w-]{11}$/.test(id)) return null;
+    const start = (url.searchParams.get('t') || '').match(/^(\d+)s?$/);
+    return { videoId: id, url: `https://www.youtube.com/watch?v=${id}${start ? `&t=${start[1]}s` : ''}` };
+  }
+  // Fara videoclip anume: pagina unui canal (de ex. .../@canal/live) sau un playlist.
+  if (!first) return null;
+  const list = url.searchParams.get('list');
+  if (first === 'playlist') return list && /^[\w-]+$/.test(list) ? { videoId: null, url: `https://www.youtube.com/playlist?list=${list}` } : null;
+  return { videoId: null, url: `https://www.youtube.com${url.pathname.replace(/\/+$/, '')}` };
+}
+
+// Titlul si canalul unui videoclip de pe orice canal (serviciul public oEmbed al YouTube).
+// Doar informativ: daca nu raspunde, linkul se salveaza oricum, fara titlu.
+export async function videoInfo(videoUrl) {
+  try {
+    const endpoint = process.env.YOUTUBE_OEMBED_URL || 'https://www.youtube.com/oembed';
+    const res = await fetch(`${endpoint}?format=json&url=${encodeURIComponent(videoUrl)}`, { signal: AbortSignal.timeout(4000) });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const clean = (v) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, 200) : null);
+    return { title: clean(data.title), channel: clean(data.author_name) };
+  } catch {
+    return null;
+  }
+}
+
 export const norm = (s) => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
 // Cuvinte care nu deosebesc o echipa de alta (forme juridice, orasul comun).

@@ -59,9 +59,17 @@ De acum, orice `git push` pe ramura principala republica site-ul.
    Exemplu de titlu bun: `Sporting Ghimbav - CSM Corona Brasov | U15 | 15.11.2026`.
    Daca site-ul nu e sigur, nu ghiceste: apesi **Alege videoclipul din lista** si atingi videoclipul corect.
    Rezumatele (titluri cu „Highlights” sau „Rezumat”) nu se leaga automat, dar pot fi alese din lista.
-5. Dupa meci, scorul se completeaza singur din datele oficiale, iar meciul trece in Arhiva.
-6. Pentru meciurile transmise inainte de lansarea site-ului: **Arata toate meciurile jucate**, apoi
-   **Transmitem** la fiecare si alegi videoclipul din lista.
+5. Transmisia este pe **alt canal de YouTube** (nu pe HandbalLiveBV)? La meciul marcat apesi
+   **Pune un link de YouTube (orice canal)**, apoi **Lipeste linkul copiat** (sau lipesti de mana in camp)
+   si **Salveaza linkul**. Linkul il copiezi din YouTube cu Distribuie → Copiaza linkul.
+   - Merge orice link de YouTube: catre un videoclip sau o transmisie programata (`youtu.be/...`,
+     `youtube.com/watch?v=...`, `youtube.com/live/...`) sau catre un canal (`youtube.com/@canal/live`).
+   - Linkul pus de mana are intaietate: nu mai este inlocuit de potrivirea automata. Il schimbi sau il
+     scoti oricand din acelasi loc (**Schimba cu un link de YouTube** → **Fara videoclip**).
+   - Pentru un link catre un videoclip, panoul afiseaza si titlul si numele canalului, daca YouTube le ofera.
+6. Dupa meci, scorul se completeaza singur din datele oficiale, iar meciul trece in Arhiva.
+7. Pentru meciurile transmise inainte de lansarea site-ului: **Arata toate meciurile jucate**, apoi
+   **Transmitem** la fiecare si alegi videoclipul din lista sau pui linkul.
 
 Feed-ul public YouTube contine doar ultimele 15 videoclipuri **publice** ale canalului. Un videoclip
 nelistat sau privat nu apare in lista. Lista se reimprospateaza la 10 minute.
@@ -127,7 +135,8 @@ npm test                      (testele: citirea sursei, clasamente, potrivirea v
 
 Pentru lucru fara internet sau fara a atinge serverul federatiei exista o sursa simulata, cu date
 reale din 11.11.2026: `npm run mock` intr-un terminal, iar in `.env` liniile
-`SOURCE_BASE_URL=http://localhost:8899/coman` si `YOUTUBE_FEED_BASE_URL=http://localhost:8899/feeds/videos.xml`.
+`SOURCE_BASE_URL=http://localhost:8899/coman` si `YOUTUBE_FEED_BASE_URL=http://localhost:8899/feeds/videos.xml`
+(optional si `YOUTUBE_OEMBED_URL=http://localhost:8899/oembed`, pentru titlul linkurilor puse de mana).
 
 ## 8. Structura
 

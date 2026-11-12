@@ -15,5 +15,11 @@ createServer((req, res) => {
   if (url.pathname === '/coman/natjecanja13.js') return res.writeHead(200, { 'content-type': 'application/javascript' }).end(catalogueFile());
   if (comp && comps.has(Number(comp[1]))) return res.writeHead(200, { 'content-type': 'application/javascript' }).end(competitionFile(comps.get(Number(comp[1]))));
   if (url.pathname === '/feeds/videos.xml') return res.writeHead(200, { 'content-type': 'text/xml' }).end(youtubeFeed(process.env.MOCK_FEED || undefined));
+  // oEmbed simulat: titlul si canalul unui videoclip de pe alt canal (pentru linkurile puse de mana in admin).
+  if (url.pathname === '/oembed') {
+    const id = (url.searchParams.get('url') || '').match(/v=([\w-]{11})/)?.[1];
+    if (!id || id.startsWith('x')) return res.writeHead(404).end('Not Found');
+    return res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify({ title: `Transmisie de test ${id}`, author_name: 'Alt Canal Handbal' }));
+  }
   res.writeHead(404).end('not found');
 }).listen(port, () => console.log(`Sursa simulata pe http://localhost:${port}`));

@@ -181,6 +181,10 @@ table.standings { width: 100%; border-collapse: collapse; font-variant-numeric: 
 .video-pick img { width: 6rem; aspect-ratio: 16 / 9; object-fit: cover; }
 .video-pick small { display: block; color: var(--grey); }
 .video-pick.none { grid-template-columns: 1fr; text-align: center; }
+.video-line { overflow-wrap: anywhere; }
+.link-form { display: grid; gap: .5rem; }
+.link-form label { font-weight: 600; }
+.link-form input { min-height: 3.5rem; width: 100%; padding: .5rem .75rem; background: var(--bg); color: var(--fg); border: 1px solid var(--grey-dim); border-radius: 3px; font: 400 1.05rem var(--body); }
 .toast { position: fixed; left: 1rem; right: 1rem; bottom: 1rem; margin: 0 auto; max-width: 34rem; background: var(--fg); color: var(--bg); padding: .9rem 1rem; border-radius: 3px; font-weight: 600; }
 pre.config { white-space: pre-wrap; word-break: break-word; border: 1px solid var(--line); padding: .9rem; font-size: .85rem; }
 [hidden] { display: none !important; }
