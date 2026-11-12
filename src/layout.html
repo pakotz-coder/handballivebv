@@ -18,6 +18,7 @@
 <link rel="apple-touch-icon" href="/assets/img/apple-touch-icon.png">
 <link rel="preload" href="/assets/fonts/barlow-condensed-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/inter-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<script src="/assets/js/theme.js?v={{v}}"></script>
 <link rel="stylesheet" href="/assets/css/site.css?v={{v}}">
 <script src="/assets/js/{{script}}?v={{v}}" defer></script>
 </head>
@@ -31,6 +32,11 @@
     <nav class="site-nav" aria-label="Navigare principală">
       <ul>{{nav}}</ul>
     </nav>
+    <button id="theme-btn" class="theme-btn" type="button" aria-pressed="false" hidden>
+      <svg class="icon-sun" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 1.5v2.5M12 20v2.5M1.5 12H4M20 12h2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"/></svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.5 14.5A8.5 8.5 0 1 1 9.5 3.5a7 7 0 0 0 11 11z"/></svg>
+      <span class="theme-label">Luminos</span>
+    </button>
   </div>
 </header>
 <main id="continut">

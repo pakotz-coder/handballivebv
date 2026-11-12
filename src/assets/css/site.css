@@ -1,5 +1,6 @@
 /* HandbalLiveBV — identitate: fundal aproape negru, text alb, un singur accent rosu,
-   titluri Barlow Condensed 800, text Inter, liniile terenului de handbal ca singur decor. */
+   titluri Barlow Condensed 800, text Inter, liniile terenului de handbal ca singur decor.
+   Tema luminoasa (buton in antet, js/theme.js): aceleasi elemente, culorile inversate, acelasi rosu. */
 @font-face { font-family: "Barlow Condensed"; font-weight: 800; font-display: swap; src: url("/assets/fonts/barlow-condensed-latin-800-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: "Barlow Condensed"; font-weight: 800; font-display: swap; src: url("/assets/fonts/barlow-condensed-latin-ext-800-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 @font-face { font-family: "Inter"; font-weight: 100 900; font-display: swap; src: url("/assets/fonts/inter-latin-wght-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
@@ -12,8 +13,21 @@
   --grey: #B8B8BC;
   --grey-dim: #6E6E74;
   --line: rgba(255, 255, 255, .14);
+  --on-accent: #FFFFFF; /* text pe fundal rosu, in ambele teme */
+  --court: url("/assets/img/court.svg");
   --display: "Barlow Condensed", "Arial Narrow", Impact, sans-serif;
   --body: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+html { color-scheme: dark; }
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg: #FFFFFF;
+  --fg: #0B0B0C;
+  --grey: #55555B;
+  --grey-dim: #8A8A90;
+  --line: rgba(11, 11, 12, .14);
+  --court: url("/assets/img/court-light.svg");
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -41,24 +55,32 @@ ul, ol { margin: 0 0 1rem; padding-left: 1.25rem; }
 
 /* Antet */
 .site-header { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); }
-.header-row { display: flex; flex-direction: column; gap: 0; padding-block: .3rem .2rem; }
-.brand { font: 800 1.7rem/1 var(--display); text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; align-self: flex-start; padding-block: .45rem; }
+.header-row { display: grid; grid-template-columns: 1fr auto; grid-template-areas: "brand theme" "nav nav"; align-items: center; column-gap: .75rem; padding-block: .3rem .2rem; }
+.brand { grid-area: brand; }
+.site-nav { grid-area: nav; min-width: 0; }
+.theme-btn { grid-area: theme; display: inline-flex; align-items: center; gap: .45rem; min-height: 2.75rem; padding: .4rem .75rem; border: 1px solid var(--grey-dim); border-radius: 3px; background: transparent; color: var(--fg); font: 600 .9rem/1 var(--body); cursor: pointer; }
+.theme-btn[hidden] { display: none; }
+.theme-btn:hover { border-color: var(--fg); }
+.theme-btn .icon-moon, [data-theme="light"] .theme-btn .icon-sun { display: none; }
+[data-theme="light"] .theme-btn .icon-moon { display: block; }
+.brand { font: 800 1.7rem/1 var(--display); text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; gap: .3rem; align-self: center; justify-self: start; padding-block: .45rem; }
 .brand-live { color: var(--accent); }
-.brand-bv { background: var(--accent); color: var(--fg); padding: .08em .22em .04em; border-radius: 2px; }
+.brand-bv { background: var(--accent); color: var(--on-accent); padding: .08em .22em .04em; border-radius: 2px; }
 .site-nav ul { list-style: none; display: flex; gap: .25rem; margin: 0 -1rem; padding: 0 1rem; overflow-x: auto; scrollbar-width: none; }
 .site-nav ul::-webkit-scrollbar { display: none; }
 .site-nav a { display: block; white-space: nowrap; padding: .7rem .65rem; color: var(--grey); text-decoration: none; font-weight: 500; font-size: .95rem; border-bottom: 3px solid transparent; }
 .site-nav a:hover { color: var(--fg); }
 .site-nav a[aria-current="page"] { color: var(--fg); border-bottom-color: var(--accent); }
 @media (min-width: 62rem) {
-  .header-row { flex-direction: row; align-items: center; justify-content: space-between; padding-block: .4rem 0; }
+  .header-row { grid-template-columns: auto 1fr auto; grid-template-areas: "brand nav theme"; column-gap: 1.25rem; padding-block: .4rem 0; }
+  .site-nav ul { justify-content: flex-end; }
   .brand { align-self: center; }
   .site-nav ul { margin: 0; padding: 0; overflow: visible; }
   .site-nav a { padding-block: 1.1rem .9rem; }
 }
 
 /* Decor: liniile terenului, in dreapta */
-.hero, .page-head { background: url("/assets/img/court.svg") no-repeat right -4rem center / auto 135%; }
+.hero, .page-head { background: var(--court) no-repeat right -4rem center / auto 135%; }
 .hero { padding-block: 1.75rem 1.75rem; border-bottom: 1px solid var(--line); }
 .hero h1 { max-width: 12ch; margin-bottom: 0; font-size: clamp(2.4rem, 10vw, 5.5rem); }
 .page-head { padding-block: 2.25rem 1rem; background-size: auto 170%; }
@@ -68,7 +90,7 @@ ul, ol { margin: 0 0 1rem; padding-left: 1.25rem; }
 .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.5rem 0 0; }
 .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 3rem; padding: .6rem 1.15rem; border: 1px solid var(--grey-dim); border-radius: 3px; background: transparent; color: var(--fg); font: 600 1rem/1.2 var(--body); text-decoration: none; cursor: pointer; }
 .btn:hover { border-color: var(--fg); }
-.btn-primary { background: var(--accent); border-color: var(--accent); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .btn-primary:hover { border-color: var(--fg); }
 .btn[disabled] { opacity: .55; cursor: progress; }
 .more { font-weight: 600; display: inline-block; padding-block: .65rem; }
@@ -88,7 +110,7 @@ ul, ol { margin: 0 0 1rem; padding-left: 1.25rem; }
 .team.lost .score { color: var(--grey); }
 .match-meta { color: var(--grey); font-size: .9rem; margin: 0; }
 .match-link { font-weight: 600; justify-self: start; padding-block: .6rem; }
-.badge { display: inline-block; font: 800 .95rem/1 var(--display); letter-spacing: .08em; text-transform: uppercase; background: var(--accent); color: var(--fg); padding: .25em .5em .2em; border-radius: 2px; }
+.badge { display: inline-block; font: 800 .95rem/1 var(--display); letter-spacing: .08em; text-transform: uppercase; background: var(--accent); color: var(--on-accent); padding: .25em .5em .2em; border-radius: 2px; }
 @media (min-width: 48rem) {
   .match { grid-template-columns: 9.5rem 1fr auto; align-items: center; }
   .match-meta { grid-column: 2; }
@@ -173,7 +195,7 @@ table.standings { width: 100%; border-collapse: collapse; font-variant-numeric: 
 .a-teams { font-size: 1.15rem; font-weight: 600; line-height: 1.35; }
 .a-meta { color: var(--grey); font-size: .92rem; margin: 0; }
 .toggle { min-height: 4rem; width: 100%; font: 800 1.6rem/1 var(--display); text-transform: uppercase; letter-spacing: .04em; border: 2px solid var(--grey-dim); border-radius: 3px; background: transparent; color: var(--fg); cursor: pointer; }
-.toggle[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); }
+.toggle[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--on-accent); }
 .toggle small { display: block; font: 500 .8rem/1.3 var(--body); text-transform: none; letter-spacing: 0; margin-top: .2rem; }
 .video-line { font-size: .95rem; margin: 0; }
 .video-list { list-style: none; padding: 0; margin: 0; display: grid; gap: .5rem; }
