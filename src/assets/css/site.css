@@ -170,6 +170,7 @@ table.standings { width: 100%; border-collapse: collapse; font-variant-numeric: 
 /* Text */
 .prose { max-width: 44rem; }
 .prose h2 { margin-top: 2rem; }
+.prose h3 { margin: 1.4rem 0 .35rem; }
 .prose li { margin-bottom: .4rem; }
 .capture { margin: 1.5rem 0 0; }
 .capture img { width: 100%; border: 1px solid var(--line); }
