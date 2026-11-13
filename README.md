@@ -156,6 +156,11 @@ alegerea fiecarui vizitator se tine minte in browserul lui. Culorile celor doua 
 incarcat in `<head>` ca pagina sa nu clipeasca in tema cealalta. Decorul terenului are doua variante:
 `court.svg` (linii albe) si `court-light.svg` (linii inchise).
 
+Termeni si confidentialitate: `src/pages/termeni-si-confidentialitate.html` (termeni de utilizare, date personale,
+cookie-uri), legata din subsol. Daca adaugi statistici (de ex. Google Analytics), un formular sau continut incarcat
+de pe alte site-uri (de ex. videoclipuri YouTube incorporate), pagina trebuie actualizata si poate fi nevoie de
+un banner de acord pentru cookie-uri.
+
 ## 9. Ce nu contine site-ul
 
 Proiect comunitar, separat de orice activitate comerciala: fara competitii de seniori in afara de

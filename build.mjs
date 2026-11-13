@@ -12,6 +12,7 @@ const pages = [
   { slug: 'cluburi', file: 'cluburi', nav: 'Cluburi', title: 'Cluburile brașovene — HandbalLiveBV', description: 'Cluburile de handbal din județul Brașov prezente în competițiile urmărite de HandbalLiveBV.' },
   { slug: 'pentru-cluburi-si-parinti', file: 'pentru-cluburi-si-parinti', nav: 'Pentru cluburi și părinți', title: 'Pentru cluburi și părinți — HandbalLiveBV', description: 'Cum ceri o transmisie, regulile de filmare, acordul pentru minori și cum ceri ștergerea unui videoclip.' },
   { slug: 'despre', file: 'despre', nav: 'Despre', title: 'Despre HandbalLiveBV', description: 'Cine face transmisiile HandbalLiveBV și de ce.' },
+  { slug: 'termeni-si-confidentialitate', file: 'termeni-si-confidentialitate', nav: null, title: 'Termeni și confidențialitate — HandbalLiveBV', description: 'Termenii de utilizare ai site-ului HandbalLiveBV, datele personale prelucrate și cookie-urile folosite.' },
   { slug: 'admin', file: 'admin', nav: null, title: 'Administrare — HandbalLiveBV', description: '', script: 'admin.js', noindex: true },
 ];
 
