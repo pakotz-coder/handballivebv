@@ -23,6 +23,18 @@ const videoUrl = (id) => `https://www.youtube.com/watch?v=${id}`;
 // Linkul pus de mana in admin (poate fi pe alt canal) are intaietate fata de videoclipul din lista canalului.
 const streamUrl = (s) => s.videoUrl || (s.videoId ? videoUrl(s.videoId) : null);
 // „1 meci”, „5 meciuri”, „23 de meciuri” (de la 20 in sus se pune „de”).
+// Sigla unui club (de pe site, /api/logo). Daca clubul nu are sigla, in locul ei apar initialele,
+// in acelasi spatiu, ca numele sa ramana aliniate.
+const CREST_SIZES = { 22: 's', 24: 's', 48: 'l', 64: 'xl' };
+const initials = (name) => (name || '')
+  .split(/[\s.-]+/)
+  .filter((w) => w && !/^(?:[A-Z]{1,4}|\d+)$/.test(w)) // fara prescurtari (CSM, ACS, HC) si ani
+  .slice(0, 2).map((w) => w[0]).join('').toUpperCase();
+const noCrest = (name, size) => el('span', { class: `crest crest-none crest-${CREST_SIZES[size] || 's'}`, 'aria-hidden': 'true', text: initials(name) });
+const crest = (id, size = 24, name = '') => (id
+  ? el('img', { class: `crest crest-${CREST_SIZES[size] || 's'}`, src: `/api/logo/${id}`, alt: '', width: size, height: size, loading: 'lazy', decoding: 'async', onerror: (e) => e.target.replaceWith(noCrest(name, size)) })
+  : noCrest(name, size));
+
 const count = (n, one, many) => `${n} ${n === 1 ? one : `${n % 100 === 0 || n % 100 >= 20 ? 'de ' : ''}${many}`}`;
 const place = (m) => [m.hall, m.city].filter(Boolean).join(', ') || 'sala se anunță';
 
@@ -35,7 +47,7 @@ function when(m, today, format = shortDate) {
 
 function teams(home, away, score) {
   const row = (team, mine, other) => el('span', { class: `team${team.club ? ' is-bv' : ''}${score && mine < other ? ' lost' : ''}` },
-    el('span', { class: 'team-name', text: team.name }),
+    el('span', { class: 'team-name' }, crest(team.logo, 24, team.name), el('span', { text: team.name })),
     score ? el('span', { class: 'score', text: String(mine) }) : null);
   return el('div', { class: 'teams' }, row(home, score?.[0], score?.[1]), row(away, score?.[1], score?.[0]));
 }
@@ -50,7 +62,7 @@ function streamItem(s, data) {
       : el('span', { class: 'match-link muted', text: 'Înregistrarea nu e încă disponibilă' });
   return el('li', { class: 'match' },
     when(s, data.today),
-    teams({ name: s.home, club: s.homeClub }, { name: s.away, club: s.awayClub }, s.score),
+    teams({ name: s.home, club: s.homeClub, logo: s.homeLogo }, { name: s.away, club: s.awayClub, logo: s.awayLogo }, s.score),
     el('p', { class: 'match-meta', text: `${s.label} · etapa ${s.round} · ${place(s)}` }),
     link);
 }
@@ -71,7 +83,10 @@ function home(data) {
   if (next) {
     fill('#next-stream', el('div', { class: 'next' },
       when(next, data.today, longDate),
-      el('p', { class: 'next-teams' }, el('span', { text: next.home }), el('span', { class: 'vs', text: 'vs' }), el('span', { text: next.away })),
+      el('p', { class: 'next-teams' },
+        el('span', { class: 'next-team' }, crest(next.homeLogo, 48, next.home), el('span', { text: next.home })),
+        el('span', { class: 'vs', text: 'vs' }),
+        el('span', { class: 'next-team' }, crest(next.awayLogo, 48, next.away), el('span', { text: next.away }))),
       el('p', { class: 'match-meta', text: `${next.label} · ${place(next)}` }),
       el('p', { class: 'actions' },
         el('a', { class: 'btn btn-primary', rel: 'noopener', href: streamUrl(next) || data.youtubeUrl, text: 'Urmărește pe YouTube' }),
@@ -135,7 +150,7 @@ function standingsTable(series) {
         th('Î', 'Înfrângeri'), th('Goluri', 'Goluri marcate și primite', 'wide'), th('Pct', 'Puncte'))),
       el('tbody', {}, series.standings.map((r) => el('tr', { class: r.club ? 'is-bv' : null },
         el('td', { class: 'pos', text: `${r.pos}.` }),
-        el('th', { scope: 'row', class: 'name', text: r.name + (r.adj ? ' *' : '') }),
+        el('th', { scope: 'row', class: 'name' }, el('span', { class: 'team-cell' }, crest(r.logo, 22, r.name), el('span', { text: r.name + (r.adj ? ' *' : '') }))),
         el('td', { text: r.played }), el('td', { text: r.w }), el('td', { text: r.d }), el('td', { text: r.l }),
         el('td', { class: 'wide', text: `${r.gf}:${r.ga}` }),
         el('td', { class: 'pts', text: r.pts })))))),
@@ -199,8 +214,8 @@ function clubs(data) {
     if (!rows.length) return null;
     const streamed = data.streams.filter((s) => !s.upcoming && (s.homeClub === club.slug || s.awayClub === club.slug)).length;
     return el('li', { class: 'card' },
-      el('h2', { text: club.name }),
-      el('p', { class: 'muted', text: club.city }),
+      el('div', { class: 'card-head' }, crest(club.logo, 64, club.name),
+        el('div', {}, el('h2', { text: club.name }), el('p', { class: 'muted', text: club.city }))),
       el('ul', {}, rows.map(([s, row]) => el('li', {},
         el('a', { href: `/rezultate/#${s.key}`, text: s.label }),
         el('span', { text: `locul ${row.pos} · ${count(row.pts, 'punct', 'puncte')}${s.verified ? '' : ' (neoficial)'}` })))),

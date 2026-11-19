@@ -103,7 +103,20 @@ ul, ol { margin: 0 0 1rem; padding-left: 1.25rem; }
 .match-when strong { color: var(--fg); font-weight: 800; }
 .teams { display: grid; gap: .15rem; font-size: 1.06rem; }
 .team { display: flex; justify-content: space-between; gap: 1rem; color: var(--grey); }
-.team-name::before { content: ""; display: inline-block; width: .5rem; height: .5rem; margin-right: .5rem; vertical-align: .08em; }
+.team-name { display: inline-flex; align-items: center; gap: .5rem; min-width: 0; }
+.team-name::before { content: ""; flex: none; display: inline-block; width: .5rem; height: .5rem; }
+/* Sigle: pe o placuta alba, ca siglele inchise la culoare sa se vada si pe fundalul negru. */
+.crest { flex: none; object-fit: contain; background: #fff; border-radius: 4px; padding: 2px; box-shadow: 0 0 0 1px var(--line); }
+.crest-s { width: 24px; height: 24px; }
+.standings .crest-s { width: 22px; height: 22px; }
+.crest-l { width: 48px; height: 48px; }
+.crest-xl { width: 64px; height: 64px; }
+.crest-none { display: inline-grid; place-items: center; background: transparent; color: var(--grey); font: 700 .62rem/1 var(--body); letter-spacing: .02em; }
+.crest-l.crest-none { font-size: 1rem; }
+.crest-xl.crest-none { font-size: 1.25rem; }
+.team-cell { display: inline-flex; align-items: center; gap: .55rem; }
+.card-head { display: flex; align-items: center; gap: 1rem; margin-bottom: .5rem; }
+.card-head .crest { padding: 4px; border-radius: 6px; }
 .team.is-bv { color: var(--fg); font-weight: 600; }
 .team.is-bv .team-name::before { background: var(--accent); }
 .score { font: 800 1.35rem/1 var(--display); color: var(--fg); min-width: 1.6rem; text-align: right; }
@@ -122,6 +135,9 @@ ul, ol { margin: 0 0 1rem; padding-left: 1.25rem; }
 .next .match-when { font-size: 1.5rem; }
 .next-teams { font: 800 clamp(1.7rem, 7vw, 2.8rem)/1.18 var(--display); text-transform: uppercase; }
 .next-teams span { display: block; }
+.next-teams .next-team { display: flex; align-items: center; gap: .75rem; }
+.next-teams .crest-none { display: inline-grid; }
+.next-team .crest { padding: 3px; border-radius: 6px; }
 .next-teams .vs { font-size: .5em; color: var(--grey); margin: 0; }
 
 /* Filtre, comutatoare */
