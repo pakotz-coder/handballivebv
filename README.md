@@ -161,6 +161,11 @@ cookie-uri), legata din subsol. Daca adaugi statistici (de ex. Google Analytics)
 de pe alte site-uri (de ex. videoclipuri YouTube incorporate), pagina trebuie actualizata si poate fi nevoie de
 un banner de acord pentru cookie-uri.
 
+Siglele cluburilor vin din sistemul federatiei (`<source.baseUrl>/logo/<clubId>.png`, acelasi `clubId` ca in
+`config/site.config.mjs`), pentru toate echipele, nu doar cele brasovene. Le aduce serverul (`/api/logo/<clubId>`,
+`netlify/lib/logos.mjs`), le verifica (doar PNG/JPEG/GIF/WebP, max. 512 KB) si le pastreaza 30 de zile in Netlify
+Blobs; vizitatorii nu se conecteaza niciodata la serverul federatiei. Un club fara sigla apare cu initialele.
+
 ## 9. Ce nu contine site-ul
 
 Proiect comunitar, separat de orice activitate comerciala: fara competitii de seniori in afara de

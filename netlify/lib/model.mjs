@@ -14,7 +14,7 @@ export const pretty = (text) => (text ? text.replace(diacriticsRe, (w) => config
 
 function decorateTeam(team) {
   const club = findClub(team);
-  return { id: team.id, name: club ? club.name : pretty(team.name), club: club ? club.slug : null };
+  return { id: team.id, name: club ? club.name : pretty(team.name), club: club ? club.slug : null, logo: team.clubId || club?.clubId || null };
 }
 
 // Ora Romaniei, ca text comparabil cu datele din sursa (care sunt deja in ora locala).
@@ -62,6 +62,7 @@ export function streamRecord(series, match, previous = {}) {
     label: series.label, category: series.category, gender: series.gender, round: match.round,
     date: match.date, time: match.time, hall: match.hall, city: match.city,
     home: match.home.name, away: match.away.name, homeClub: match.home.club, awayClub: match.away.club,
+    homeLogo: match.home.logo || previous.homeLogo || null, awayLogo: match.away.logo || previous.awayLogo || null,
     played: match.played, score: match.score,
   };
 }
@@ -111,6 +112,6 @@ export async function buildPublicData() {
     youtubeUrl: config.youtube.channelUrl,
     series,
     streams: list,
-    clubs: config.clubs.map(({ slug, name, city }) => ({ slug, name, city })),
+    clubs: config.clubs.map(({ slug, name, city, clubId }) => ({ slug, name, city, logo: clubId })),
   };
 }
